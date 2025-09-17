@@ -5,15 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    network_mode: host
+    ports:
+      - "20050:20050"
     environment:
-      - TZ=Asia/Tashkent
+      - TZ=Europe/Moscow
     env_file:
       - .env
+    volumes:
+      - ./logs:/app/logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:20050/health_check"]
       interval: 30s
       timeout: 10s
       retries: 3
     restart: always
-    cpus: 8.0
