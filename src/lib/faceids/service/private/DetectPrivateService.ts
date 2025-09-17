@@ -127,9 +127,9 @@ export class DetectPrivateService {
     const output = await factory.fetchJson();
     return output?.confidence
       ? {
-        averageConf: output.confidence.average_conf,
-        faceObjects: output.confidence.face_objects,
-      }
+          averageConf: output.confidence.average_conf,
+          faceObjects: output.confidence.face_objects,
+        }
       : null;
   };
 
@@ -242,20 +242,31 @@ export class DetectPrivateService {
     };
   };
 
-  public detectLicensePlateByBlob = async (imageFile: Blob): Promise<ILicensePlaceDetect[]> => {
-    this.loggerService.logCtx(`detectPrivateService detectLicensePlateByBlob`);
+  public detectLicensePlate = async (
+    imageId: string
+  ): Promise<ILicensePlaceDetect[]> => {
+    this.loggerService.logCtx(`detectPrivateService detectLicensePlate`, {
+      imageId,
+    });
+    const imageData = await minio.imageDataGlobalService.getObject(
+      imageId,
+      this.contextService.context
+    );
     const formData = new FormData();
-    formData.append("photo", imageFile, "image.jpg");
-    formData.append("attributes", JSON.stringify({
-      car: {
-        license_plate: true,
-        special_vehicle_type: true,
-        category: true,
-        weight_type: true,
-        orientation: true,
-        description: true,
-      }
-    }));
+    formData.append("photo", imageData, "image.jpg");
+    formData.append(
+      "attributes",
+      JSON.stringify({
+        car: {
+          license_plate: true,
+          special_vehicle_type: true,
+          category: true,
+          weight_type: true,
+          orientation: true,
+          description: true,
+        },
+      })
+    );
     const factory = RequestFactory.makeRequest(
       `detectPrivateService detectLicensePlateByBlob`,
       `${CC_FACEIDS_URL}/detect/`,
@@ -276,7 +287,91 @@ export class DetectPrivateService {
     }
     for (const {
       features: {
-        license_plate_number: { bbox, name: licensePlate = "", confidence = 0 } = {},
+        license_plate_number: {
+          bbox,
+          name: licensePlate = "",
+          confidence = 0,
+        } = {},
+        license_plate_country: { name: country = "unknown" } = {},
+        orientation: { name: orientation = "unknown" } = {},
+        category: { name: category = "unknown" } = {},
+        body: { name: body = "unknown" } = {},
+        make: { name: make = "unknown" } = {},
+        model: { name: model = "unknown" } = {},
+        color: { name: color = "unknown" } = {},
+      },
+    } of data.objects.car) {
+      if (confidence < MIN_LICENSE_PLACE_CONFIDENCE) {
+        continue;
+      }
+      const bbox_top = bbox?.top ?? 0;
+      const bbox_left = bbox?.left ?? 0;
+      const bbox_right = bbox?.right ?? 0;
+      const bbox_bottom = bbox?.bottom ?? 0;
+      if (licensePlate !== "unknown") {
+        result.push({
+          bbox_top,
+          bbox_left,
+          bbox_right,
+          bbox_bottom,
+          licensePlate,
+          orientation,
+          category,
+          country,
+          body,
+          make,
+          model,
+          color,
+        });
+      }
+    }
+    return result;
+  };
+
+  public detectLicensePlateByBlob = async (
+    imageFile: Blob
+  ): Promise<ILicensePlaceDetect[]> => {
+    this.loggerService.logCtx(`detectPrivateService detectLicensePlateByBlob`);
+    const formData = new FormData();
+    formData.append("photo", imageFile, "image.jpg");
+    formData.append(
+      "attributes",
+      JSON.stringify({
+        car: {
+          license_plate: true,
+          special_vehicle_type: true,
+          category: true,
+          weight_type: true,
+          orientation: true,
+          description: true,
+        },
+      })
+    );
+    const factory = RequestFactory.makeRequest(
+      `detectPrivateService detectLicensePlateByBlob`,
+      `${CC_FACEIDS_URL}/detect/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${this.tokenService.getToken()}`,
+        },
+        body: formData,
+      },
+      this.contextService.context
+    );
+    const response = await factory.fetch();
+    const data = <any>await response.json();
+    const result = [];
+    if (!data?.objects?.car) {
+      return result;
+    }
+    for (const {
+      features: {
+        license_plate_number: {
+          bbox,
+          name: licensePlate = "",
+          confidence = 0,
+        } = {},
         license_plate_country: { name: country = "unknown" } = {},
         orientation: { name: orientation = "unknown" } = {},
         category: { name: category = "unknown" } = {},

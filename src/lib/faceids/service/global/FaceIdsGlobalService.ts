@@ -963,6 +963,66 @@ export class ListenerService
     );
   };
 
+  public detectLicensePlate = async (request: TRequest<{ imageId: string }>) => {
+    this.loggerService.log("faceIdsGlobalService detectLicensePlate", { request });
+    return await ContextService.runInContext(
+      async (): Promise<TResponse<ILicensePlaceDetect[]>> => {
+        try {
+          const data = await this.detectPublicService.detectLicensePlate(
+            request.data.imageId
+          );
+          if (data === CANCELED_PROMISE_SYMBOL) {
+            throw new Error("request canceled");
+          }
+          this.loggerService.log("faceIdsGlobalService detectLicensePlate ok", {
+            request,
+            data,
+          });
+          return {
+            status: "ok",
+            serviceName: request.serviceName,
+            clientId: request.clientId,
+            userId: request.userId,
+            requestId: request.requestId,
+            data,
+          };
+        } catch (error: any) {
+          if (error?.statusCode === 401 || error?.statusCode === 403) {
+            this.loggerService.log("faceIdsGlobalService detectLicensePlate 401", {
+              request,
+            });
+            this.getToken.clear();
+            return await this.detectLicensePlate(request);
+          }
+          this.loggerService.log("faceIdsGlobalService detectLicensePlate error", {
+            request,
+            error: errorData(error),
+          });
+          return {
+            status: "error",
+            error: getErrorMessage(error),
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          };
+        }
+      },
+      {
+        clientId: request.clientId,
+        serviceName: request.serviceName,
+        requestId: request.userId,
+        userId: request.userId,
+        token: await this.getToken({
+          clientId: request.clientId,
+          requestId: request.requestId,
+          serviceName: request.serviceName,
+          userId: request.userId,
+        }),
+      }
+    );
+  };
+
   public detectLicensePlateByBlob = async (request: TRequest<{ imageFile: Blob }>) => {
     this.loggerService.log("faceIdsGlobalService detectLicensePlateByBlob", { request });
     return await ContextService.runInContext(

@@ -100,6 +100,19 @@ export class DetectPublicService implements TDetectPublicService {
     }
   );
 
+  public detectLicensePlate = execpool<ILicensePlaceDetect[] | typeof CANCELED_PROMISE_SYMBOL>(
+    retry(async (imageId: string) => {
+      this.loggerService.logCtx("detectPublicService detectLicensePlate", {
+        imageId,
+      });
+      return await this.detectPrivateService.detectLicensePlate(imageId);
+    }),
+    {
+      maxExec: 35,
+      delay: 10,
+    }
+  );
+
   public detectLicensePlateByBlob = execpool<ILicensePlaceDetect[] | typeof CANCELED_PROMISE_SYMBOL>(
     retry(async (imageFile: Blob) => {
       this.loggerService.logCtx("detectPublicService detectLicensePlateByBlob");
