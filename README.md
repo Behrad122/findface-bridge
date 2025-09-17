@@ -14,7 +14,7 @@ services:
   app:
     image: tripolskypetr/findface-bridge:latest
     ports:
-      - "30050:30050"
+      - "20050:20050"
     environment:
       - TZ=Europe/Moscow
     env_file:
@@ -22,7 +22,7 @@ services:
     volumes:
       - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:30050/health_check"]
+      test: ["CMD", "curl", "-f", "http://localhost:20050/health_check"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -571,7 +571,7 @@ docker run -d \
 ### Распознавание лица на изображении
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/findface/detectFace \
+curl -X POST http://localhost:20050/api/v1/findface/detectFace \
   -H "Content-Type: application/json" \
   -d '{
     "serviceName": "my-service",
@@ -588,7 +588,7 @@ curl -X POST http://localhost:3000/api/v1/findface/detectFace \
 ### Создание снимка с камеры
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/findface/captureScreenshot \
+curl -X POST http://localhost:20050/api/v1/findface/captureScreenshot \
   -H "Content-Type: application/json" \
   -d '{
     "serviceName": "my-service",
