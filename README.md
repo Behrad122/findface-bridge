@@ -602,5 +602,4 @@ curl -X POST http://localhost:3000/api/v1/findface/captureScreenshot \
 - Поля `serviceName`, `clientId`, `userId`, `requestId` обязательны для всех запросов
 - Время ответа может варьироваться в зависимости от размера изображения и сложности операции
 - API поддерживает только POST запросы
-- Приложение использует часовой пояс Asia/Tashkent по умолчанию
 - Health check проверяет доступность на `/health_check` каждые 30 секунд
