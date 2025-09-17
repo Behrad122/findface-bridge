@@ -21,7 +21,7 @@ export class ErrorService {
     };
 
     private _listenForError = () => {
-        console.log("Global exceptions listened in faceids");
+        console.log("Global exceptions listened in findface");
         process.on('uncaughtException', (err) => {
             console.log(err);
             this.handleGlobalError(err);

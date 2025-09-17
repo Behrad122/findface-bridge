@@ -21,7 +21,7 @@ const publicServices = {
 };
 
 const globalServices = {
-    faceIdsGlobalService: Symbol('faceIdsGlobalService'),
+    findFaceGlobalService: Symbol('findFaceGlobalService'),
 };
 
 export const TYPES = {

@@ -46,7 +46,7 @@ REST API для работы с системой распознавания ли
 
 ### 1. Обнаружение лиц на изображении
 
-**POST** `/api/v1/faceids/detectFace`
+**POST** `/api/v1/findface/detectFace`
 
 Обнаруживает лица на переданном изображении.
 
@@ -86,7 +86,7 @@ REST API для работы с системой распознавания ли
 
 ### 2. Распознавание номерных знаков
 
-**POST** `/api/v1/faceids/detectLicensePlate`
+**POST** `/api/v1/findface/detectLicensePlate`
 
 Распознает номерные знаки на изображении.
 
@@ -129,7 +129,7 @@ REST API для работы с системой распознавания ли
 
 ### 3. Создание снимка с камеры
 
-**POST** `/api/v1/faceids/captureScreenshot`
+**POST** `/api/v1/findface/captureScreenshot`
 
 Создает снимок с указанной камеры.
 
@@ -159,7 +159,7 @@ REST API для работы с системой распознавания ли
 
 ### 4. Верификация лица
 
-**POST** `/api/v1/faceids/verifyFace`
+**POST** `/api/v1/findface/verifyFace`
 
 Сравнивает обнаруженное лицо с картой лица в базе данных.
 
@@ -190,7 +190,7 @@ REST API для работы с системой распознавания ли
 
 ### 5. Создание лица в карте
 
-**POST** `/api/v1/faceids/createFace`
+**POST** `/api/v1/findface/createFace`
 
 Добавляет новое лицо к существующей карте.
 
@@ -224,7 +224,7 @@ REST API для работы с системой распознавания ли
 
 ### 6. Получение списка лиц
 
-**POST** `/api/v1/faceids/listFace`
+**POST** `/api/v1/findface/listFace`
 
 Получает список всех лиц для указанной карты.
 
@@ -258,7 +258,7 @@ REST API для работы с системой распознавания ли
 
 ### 7. Удаление лица
 
-**POST** `/api/v1/faceids/removeFace`
+**POST** `/api/v1/findface/removeFace`
 
 Удаляет лицо по его идентификатору.
 
@@ -285,7 +285,7 @@ REST API для работы с системой распознавания ли
 
 ### 8. Поиск карты по обнаружению
 
-**POST** `/api/v1/faceids/findByDetection`
+**POST** `/api/v1/findface/findByDetection`
 
 Находит карту человека по идентификатору обнаружения лица.
 
@@ -315,7 +315,7 @@ REST API для работы с системой распознавания ли
 
 ### 9. Поиск карты по ID
 
-**POST** `/api/v1/faceids/findByCardId`
+**POST** `/api/v1/findface/findByCardId`
 
 Находит карту человека по её идентификатору.
 
@@ -345,7 +345,7 @@ REST API для работы с системой распознавания ли
 
 ### 10. Создание карты человека
 
-**POST** `/api/v1/faceids/createHumanCard`
+**POST** `/api/v1/findface/createHumanCard`
 
 Создает новую карту человека.
 
@@ -375,7 +375,7 @@ REST API для работы с системой распознавания ли
 
 ### 11. Обновление карты человека
 
-**POST** `/api/v1/faceids/updateHumanCard`
+**POST** `/api/v1/findface/updateHumanCard`
 
 Обновляет существующую карту человека.
 
@@ -408,7 +408,7 @@ REST API для работы с системой распознавания ли
 
 ### 12. Создание события лица
 
-**POST** `/api/v1/faceids/eventFace`
+**POST** `/api/v1/findface/eventFace`
 
 Создает событие распознавания лица на изображении.
 
@@ -428,7 +428,7 @@ REST API для работы с системой распознавания ли
 
 ### 13. Создание события лица по ID карты
 
-**POST** `/api/v1/faceids/eventFaceByCardId`
+**POST** `/api/v1/findface/eventFaceByCardId`
 
 Создает событие лица для конкретной карты.
 
@@ -447,7 +447,7 @@ REST API для работы с системой распознавания ли
 
 ### 14. Добавление вложения к карте
 
-**POST** `/api/v1/faceids/addHumanCardAttachment`
+**POST** `/api/v1/findface/addHumanCardAttachment`
 
 Добавляет изображение как вложение к карте человека.
 
@@ -483,7 +483,7 @@ REST API для работы с системой распознавания ли
 ### Распознавание лица на изображении
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/faceids/detectFace \
+curl -X POST http://localhost:3000/api/v1/findface/detectFace \
   -H "Content-Type: application/json" \
   -d '{
     "serviceName": "my-service",
@@ -500,7 +500,7 @@ curl -X POST http://localhost:3000/api/v1/faceids/detectFace \
 ### Создание снимка с камеры
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/faceids/captureScreenshot \
+curl -X POST http://localhost:3000/api/v1/findface/captureScreenshot \
   -H "Content-Type: application/json" \
   -d '{
     "serviceName": "my-service",

@@ -15,8 +15,8 @@ import {
 import AuthService from "../base/AuthService";
 import {
   CC_ENABLE_TERMINATE_SESSIONS,
-  CC_FACEIDS_PASSWORD,
-  CC_FACEIDS_USER,
+  CC_FINDFACE_PASSWORD,
+  CC_FINDFACE_USER,
 } from "../../config/params";
 import DetectPublicService, {
   TDetectPublicService,
@@ -79,25 +79,25 @@ export class ListenerService
       serviceName: string;
       userId: string;
     }) => {
-      this.loggerService.log("faceIdsGlobalService getToken", context);
+      this.loggerService.log("findFaceGlobalService getToken", context);
       try {
         const token = await this.authService.login(
-          CC_FACEIDS_USER,
-          CC_FACEIDS_PASSWORD,
+          CC_FINDFACE_USER,
+          CC_FINDFACE_PASSWORD,
           context
         );
-        this.loggerService.log("faceIdsGlobalService getToken login ok", context);
+        this.loggerService.log("findFaceGlobalService getToken login ok", context);
         if (CC_ENABLE_TERMINATE_SESSIONS) {
           await this.authService.terminateOfflineSessions(token, context);
           this.loggerService.log(
-            "faceIdsGlobalService terminateOfflineSessions ok",
+            "findFaceGlobalService terminateOfflineSessions ok",
             context
           );
         }
         return token;
       } catch (error: any) {
         if (error?.statusCode === 401 || error?.statusCode === 403) {
-          this.loggerService.log("faceIdsGlobalService getToken login 401", context);
+          this.loggerService.log("findFaceGlobalService getToken login 401", context);
         }
         this.getToken.clear();
         throw error;
@@ -106,7 +106,7 @@ export class ListenerService
   );
 
   public detectFace = async (request: TRequest<{ imageId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService detectFace", { request });
+    this.loggerService.log("findFaceGlobalService detectFace", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceDetect[]>> => {
         try {
@@ -116,7 +116,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService detectFace ok", {
+          this.loggerService.log("findFaceGlobalService detectFace ok", {
             request,
             data,
           });
@@ -130,13 +130,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService detectFace 401", {
+            this.loggerService.log("findFaceGlobalService detectFace 401", {
               request,
             });
             this.getToken.clear();
             return await this.detectFace(request);
           }
-          this.loggerService.log("faceIdsGlobalService detectFace error", {
+          this.loggerService.log("findFaceGlobalService detectFace error", {
             request,
             error: errorData(error),
           });
@@ -166,7 +166,7 @@ export class ListenerService
   };
 
   public detectFaceByBlob = async (request: TRequest<{ blob: Blob }>) => {
-    this.loggerService.log("faceIdsGlobalService detectFaceByBlob", { request });
+    this.loggerService.log("findFaceGlobalService detectFaceByBlob", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceDetect[]>> => {
         try {
@@ -176,7 +176,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService detectFaceByBlob ok", {
+          this.loggerService.log("findFaceGlobalService detectFaceByBlob ok", {
             request,
             data,
           });
@@ -190,13 +190,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService detectFaceByBlob 401", {
+            this.loggerService.log("findFaceGlobalService detectFaceByBlob 401", {
               request,
             });
             this.getToken.clear();
             return await this.detectFaceByBlob(request);
           }
-          this.loggerService.log("faceIdsGlobalService detectFaceByBlob error", {
+          this.loggerService.log("findFaceGlobalService detectFaceByBlob error", {
             request,
             error: errorData(error),
           });
@@ -228,7 +228,7 @@ export class ListenerService
   public verifyFace = async (
     request: TRequest<{ cardId: string; detectionId: string }>
   ) => {
-    this.loggerService.log("faceIdsGlobalService verifyFace", { request });
+    this.loggerService.log("findFaceGlobalService verifyFace", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceVerify | null>> => {
         try {
@@ -239,7 +239,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService verifyFace ok", {
+          this.loggerService.log("findFaceGlobalService verifyFace ok", {
             request,
             data,
           });
@@ -253,13 +253,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService verifyFace 401", {
+            this.loggerService.log("findFaceGlobalService verifyFace 401", {
               request,
             });
             this.getToken.clear();
             return await this.verifyFace(request);
           }
-          this.loggerService.log("faceIdsGlobalService verifyFace error", {
+          this.loggerService.log("findFaceGlobalService verifyFace error", {
             request,
             error: errorData(error),
           });
@@ -291,7 +291,7 @@ export class ListenerService
   public verifyDetect = async (
     request: TRequest<{ detectionId2: string; detectionId1: string }>
   ) => {
-    this.loggerService.log("faceIdsGlobalService verifyDetect", { request });
+    this.loggerService.log("findFaceGlobalService verifyDetect", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IDetectVerify | null>> => {
         try {
@@ -302,7 +302,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService verifyDetect ok", {
+          this.loggerService.log("findFaceGlobalService verifyDetect ok", {
             request,
             data,
           });
@@ -316,13 +316,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService verifyDetect 401", {
+            this.loggerService.log("findFaceGlobalService verifyDetect 401", {
               request,
             });
             this.getToken.clear();
             return await this.verifyDetect(request);
           }
-          this.loggerService.log("faceIdsGlobalService verifyDetect error", {
+          this.loggerService.log("findFaceGlobalService verifyDetect error", {
             request,
             error: errorData(error),
           });
@@ -352,7 +352,7 @@ export class ListenerService
   };
 
   public eventFace = async (request: TRequest<{ imageId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService eventFace", { request });
+    this.loggerService.log("findFaceGlobalService eventFace", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceEvent>> => {
         try {
@@ -362,7 +362,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService eventFace ok", {
+          this.loggerService.log("findFaceGlobalService eventFace ok", {
             request,
             data,
           });
@@ -376,13 +376,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService eventFace 401", {
+            this.loggerService.log("findFaceGlobalService eventFace 401", {
               request,
             });
             this.getToken.clear();
             return await this.eventFace(request);
           }
-          this.loggerService.log("faceIdsGlobalService eventFace error", {
+          this.loggerService.log("findFaceGlobalService eventFace error", {
             request,
             error: errorData(error),
           });
@@ -412,7 +412,7 @@ export class ListenerService
   };
 
   public eventFaceByCardId = async (request: TRequest<{ cardId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService eventFaceByCardId", { request });
+    this.loggerService.log("findFaceGlobalService eventFaceByCardId", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceEvent>> => {
         try {
@@ -422,7 +422,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService eventFaceByCardId ok", {
+          this.loggerService.log("findFaceGlobalService eventFaceByCardId ok", {
             request,
             data,
           });
@@ -436,13 +436,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService eventFaceByCardId 401", {
+            this.loggerService.log("findFaceGlobalService eventFaceByCardId 401", {
               request,
             });
             this.getToken.clear();
             return await this.eventFaceByCardId(request);
           }
-          this.loggerService.log("faceIdsGlobalService eventFaceByCardId error", {
+          this.loggerService.log("findFaceGlobalService eventFaceByCardId error", {
             request,
             error: errorData(error),
           });
@@ -474,7 +474,7 @@ export class ListenerService
   public createFace = async (
     request: TRequest<{ cardId: string; imageId: string }>
   ) => {
-    this.loggerService.log("faceIdsGlobalService createFace", { request });
+    this.loggerService.log("findFaceGlobalService createFace", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFace>> => {
         try {
@@ -485,7 +485,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService createFace ok", {
+          this.loggerService.log("findFaceGlobalService createFace ok", {
             request,
             data,
           });
@@ -499,13 +499,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService createFace 401", {
+            this.loggerService.log("findFaceGlobalService createFace 401", {
               request,
             });
             this.getToken.clear();
             return await this.createFace(request);
           }
-          this.loggerService.log("faceIdsGlobalService createFace error", {
+          this.loggerService.log("findFaceGlobalService createFace error", {
             request,
             error: errorData(error),
           });
@@ -535,7 +535,7 @@ export class ListenerService
   };
 
   public listFace = async (request: TRequest<{ cardId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService listFace", { request });
+    this.loggerService.log("findFaceGlobalService listFace", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFace[]>> => {
         try {
@@ -545,7 +545,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService listFace ok", {
+          this.loggerService.log("findFaceGlobalService listFace ok", {
             request,
             data,
           });
@@ -559,11 +559,11 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService listFace 401", { request });
+            this.loggerService.log("findFaceGlobalService listFace 401", { request });
             this.getToken.clear();
             return await this.listFace(request);
           }
-          this.loggerService.log("faceIdsGlobalService listFace error", {
+          this.loggerService.log("findFaceGlobalService listFace error", {
             request,
             error: errorData(error),
           });
@@ -593,7 +593,7 @@ export class ListenerService
   };
 
   public removeFace = async (request: TRequest<{ faceId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService removeFace", { request });
+    this.loggerService.log("findFaceGlobalService removeFace", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<null>> => {
         try {
@@ -603,7 +603,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService removeFace ok", {
+          this.loggerService.log("findFaceGlobalService removeFace ok", {
             request,
             data,
           });
@@ -617,13 +617,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService removeFace 401", {
+            this.loggerService.log("findFaceGlobalService removeFace 401", {
               request,
             });
             this.getToken.clear();
             return await this.removeFace(request);
           }
-          this.loggerService.log("faceIdsGlobalService removeFace error", {
+          this.loggerService.log("findFaceGlobalService removeFace error", {
             request,
             error: errorData(error),
           });
@@ -655,7 +655,7 @@ export class ListenerService
   public findByDetection = async (
     request: TRequest<{ detectionId: string }>
   ) => {
-    this.loggerService.log("faceIdsGlobalService findByDetection", { request });
+    this.loggerService.log("findFaceGlobalService findByDetection", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow | null>> => {
         try {
@@ -665,7 +665,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService findByDetection ok", {
+          this.loggerService.log("findFaceGlobalService findByDetection ok", {
             request,
             data,
           });
@@ -679,13 +679,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService findByDetection 401", {
+            this.loggerService.log("findFaceGlobalService findByDetection 401", {
               request,
             });
             this.getToken.clear();
             return await this.findByDetection(request);
           }
-          this.loggerService.log("faceIdsGlobalService findByDetection error", {
+          this.loggerService.log("findFaceGlobalService findByDetection error", {
             request,
             error: errorData(error),
           });
@@ -715,7 +715,7 @@ export class ListenerService
   };
 
   public findByCardId = async (request: TRequest<{ cardId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService findByCardId", { request });
+    this.loggerService.log("findFaceGlobalService findByCardId", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow | null>> => {
         try {
@@ -725,7 +725,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService findByCardId ok", {
+          this.loggerService.log("findFaceGlobalService findByCardId ok", {
             request,
             data,
           });
@@ -739,13 +739,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService findByCardId 401", {
+            this.loggerService.log("findFaceGlobalService findByCardId 401", {
               request,
             });
             this.getToken.clear();
             return await this.findByCardId(request);
           }
-          this.loggerService.log("faceIdsGlobalService findByCardId error", {
+          this.loggerService.log("findFaceGlobalService findByCardId error", {
             request,
             error: errorData(error),
           });
@@ -775,7 +775,7 @@ export class ListenerService
   };
 
   public createHumanCard = async (request: TRequest<IHumanCardDto>) => {
-    this.loggerService.log("faceIdsGlobalService createHumanCard", { request });
+    this.loggerService.log("findFaceGlobalService createHumanCard", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow>> => {
         try {
@@ -785,7 +785,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService createHumanCard ok", {
+          this.loggerService.log("findFaceGlobalService createHumanCard ok", {
             request,
             data,
           });
@@ -799,13 +799,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService createHumanCard 401", {
+            this.loggerService.log("findFaceGlobalService createHumanCard 401", {
               request,
             });
             this.getToken.clear();
             return await this.createHumanCard(request);
           }
-          this.loggerService.log("faceIdsGlobalService createHumanCard error", {
+          this.loggerService.log("findFaceGlobalService createHumanCard error", {
             request,
             error: errorData(error),
           });
@@ -837,7 +837,7 @@ export class ListenerService
   public updateHumanCard = async (
     request: TRequest<{ id: number; dto: IHumanCardDto }>
   ) => {
-    this.loggerService.log("faceIdsGlobalService updateHumanCard", { request });
+    this.loggerService.log("findFaceGlobalService updateHumanCard", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow>> => {
         try {
@@ -848,7 +848,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService updateHumanCard ok", {
+          this.loggerService.log("findFaceGlobalService updateHumanCard ok", {
             request,
             data,
           });
@@ -862,13 +862,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService updateHumanCard 401", {
+            this.loggerService.log("findFaceGlobalService updateHumanCard 401", {
               request,
             });
             this.getToken.clear();
             return await this.updateHumanCard(request);
           }
-          this.loggerService.log("faceIdsGlobalService updateHumanCard error", {
+          this.loggerService.log("findFaceGlobalService updateHumanCard error", {
             request,
             error: errorData(error),
           });
@@ -900,7 +900,7 @@ export class ListenerService
   public addHumanCardAttachment = async (
     request: TRequest<{ id: number; imageId: string }>
   ) => {
-    this.loggerService.log("faceIdsGlobalService addHumanCardAttachment", {
+    this.loggerService.log("findFaceGlobalService addHumanCardAttachment", {
       request,
     });
     return await ContextService.runInContext(
@@ -913,7 +913,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService addHumanCardAttachment ok", {
+          this.loggerService.log("findFaceGlobalService addHumanCardAttachment ok", {
             request,
             data,
           });
@@ -928,14 +928,14 @@ export class ListenerService
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log(
-              "faceIdsGlobalService addHumanCardAttachment 401",
+              "findFaceGlobalService addHumanCardAttachment 401",
               { request }
             );
             this.getToken.clear();
             return await this.addHumanCardAttachment(request);
           }
           this.loggerService.log(
-            "faceIdsGlobalService addHumanCardAttachment error",
+            "findFaceGlobalService addHumanCardAttachment error",
             { request, error: errorData(error) }
           );
           return {
@@ -964,7 +964,7 @@ export class ListenerService
   };
 
   public detectLicensePlate = async (request: TRequest<{ imageId: string }>) => {
-    this.loggerService.log("faceIdsGlobalService detectLicensePlate", { request });
+    this.loggerService.log("findFaceGlobalService detectLicensePlate", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<ILicensePlaceDetect[]>> => {
         try {
@@ -974,7 +974,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService detectLicensePlate ok", {
+          this.loggerService.log("findFaceGlobalService detectLicensePlate ok", {
             request,
             data,
           });
@@ -988,13 +988,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService detectLicensePlate 401", {
+            this.loggerService.log("findFaceGlobalService detectLicensePlate 401", {
               request,
             });
             this.getToken.clear();
             return await this.detectLicensePlate(request);
           }
-          this.loggerService.log("faceIdsGlobalService detectLicensePlate error", {
+          this.loggerService.log("findFaceGlobalService detectLicensePlate error", {
             request,
             error: errorData(error),
           });
@@ -1024,7 +1024,7 @@ export class ListenerService
   };
 
   public detectLicensePlateByBlob = async (request: TRequest<{ imageFile: Blob }>) => {
-    this.loggerService.log("faceIdsGlobalService detectLicensePlateByBlob", { request });
+    this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<ILicensePlaceDetect[]>> => {
         try {
@@ -1034,7 +1034,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService detectLicensePlateByBlob ok", {
+          this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob ok", {
             request,
             data,
           });
@@ -1048,13 +1048,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService detectLicensePlateByBlob 401", {
+            this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob 401", {
               request,
             });
             this.getToken.clear();
             return await this.detectLicensePlateByBlob(request);
           }
-          this.loggerService.log("faceIdsGlobalService detectLicensePlateByBlob error", {
+          this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob error", {
             request,
             error: errorData(error),
           });
@@ -1084,7 +1084,7 @@ export class ListenerService
   };
 
   public captureScreenshot = async (request: TRequest<{ cameraId: number }>) => {
-    this.loggerService.log("faceIdsGlobalService captureScreenshot", { request });
+    this.loggerService.log("findFaceGlobalService captureScreenshot", { request });
     return await ContextService.runInContext(
       async (): Promise<TResponse<Blob>> => {
         try {
@@ -1094,7 +1094,7 @@ export class ListenerService
           if (data === CANCELED_PROMISE_SYMBOL) {
             throw new Error("request canceled");
           }
-          this.loggerService.log("faceIdsGlobalService captureScreenshot ok", {
+          this.loggerService.log("findFaceGlobalService captureScreenshot ok", {
             request,
             data,
           });
@@ -1108,13 +1108,13 @@ export class ListenerService
           };
         } catch (error: any) {
           if (error?.statusCode === 401 || error?.statusCode === 403) {
-            this.loggerService.log("faceIdsGlobalService captureScreenshot 401", {
+            this.loggerService.log("findFaceGlobalService captureScreenshot 401", {
               request,
             });
             this.getToken.clear();
             return await this.captureScreenshot(request);
           }
-          this.loggerService.log("faceIdsGlobalService captureScreenshot error", {
+          this.loggerService.log("findFaceGlobalService captureScreenshot error", {
             request,
             error: errorData(error),
           });

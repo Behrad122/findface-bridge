@@ -13,7 +13,7 @@ import { CardPublicService } from "./service/public/CardPublicService";
 import FacePublicService from "./service/public/FacePublicService";
 import DetectPublicService from "./service/public/DetectPublicService";
 import CapturePublicService from "./service/public/CapturePublicService";
-import FaceIdsGlobalService from "./service/global/FaceIdsGlobalService";
+import FindFaceGlobalService from "./service/global/FindFaceGlobalService";
 import ContextService, { TContextService } from "./service/base/ContextService";
 
 const baseServices = {
@@ -38,10 +38,10 @@ const publicServices = {
 };
 
 const globalServices = {
-    faceIdsGlobalService: inject<FaceIdsGlobalService>(TYPES.faceIdsGlobalService),
+    findFaceGlobalService: inject<FindFaceGlobalService>(TYPES.findFaceGlobalService),
 };
 
-export const faceids = {
+export const findface = {
     ...baseServices,
     ...privateSerivces,
     ...publicServices,
@@ -50,6 +50,6 @@ export const faceids = {
 
 init();
 
-Object.assign(globalThis, { faceids });
+Object.assign(globalThis, { findface });
 
 export { ContextService };

@@ -7,7 +7,7 @@ export const app = new Hono();
 app.use("*", cors());
 
 app.notFound(async (ctx) => {
-return ctx.text("faceids-bridge", 404);
+return ctx.text("findface-bridge", 404);
 });
 
 export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({

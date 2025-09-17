@@ -1,4 +1,4 @@
-import "./lib/faceids";
+import "./lib/findface";
 import "./lib/minio";
 
 import "./main/hono";

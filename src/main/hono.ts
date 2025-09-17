@@ -3,7 +3,7 @@ import { app, injectWebSocket } from "../config/app";
 
 import { createServer } from "http";
 
-import "../routes/faceids";
+import "../routes/findface";
 import "../routes/health";
 
 const HONO_PORT = 30050;

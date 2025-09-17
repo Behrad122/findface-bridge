@@ -3,9 +3,9 @@ import LoggerService from "../base/LoggerService";
 import TokenService from "../base/TokenService";
 import TYPES from "../../config/types";
 import {
-  CC_FACEIDS_EVENT_CAMERA,
-  CC_FACEIDS_EVENT_TOKEN,
-  CC_FACEIDS_URL,
+  CC_FINDFACE_EVENT_CAMERA,
+  CC_FINDFACE_EVENT_TOKEN,
+  CC_FINDFACE_URL,
 } from "../../config/params";
 import { IFaceDetect } from "../../model/FaceDetect.model";
 import IFaceVerify from "../../model/FaceVerify.model";
@@ -42,7 +42,7 @@ export class DetectPrivateService {
     formData.append("attributes", JSON.stringify({ face: {} }));
     const factory = RequestFactory.makeRequest(
       `detectPrivateService detectFace`,
-      `${CC_FACEIDS_URL}/detect/`,
+      `${CC_FINDFACE_URL}/detect/`,
       {
         method: "POST",
         headers: {
@@ -77,7 +77,7 @@ export class DetectPrivateService {
     );
     const factory = RequestFactory.makeRequest(
       `detectPrivateService detectFaceByBlob`,
-      `${CC_FACEIDS_URL}/detect/`,
+      `${CC_FINDFACE_URL}/detect/`,
       {
         method: "POST",
         headers: {
@@ -110,7 +110,7 @@ export class DetectPrivateService {
       cardId,
       detectionId,
     });
-    const url = new URL(`${CC_FACEIDS_URL}/verify/`);
+    const url = new URL(`${CC_FINDFACE_URL}/verify/`);
     url.searchParams.set("card_id", String(cardId));
     url.searchParams.set("object1", `detection:${detectionId}`);
     const factory = RequestFactory.makeRequest(
@@ -141,7 +141,7 @@ export class DetectPrivateService {
       detectionId1,
       detectionId2,
     });
-    const url = new URL(`${CC_FACEIDS_URL}/verify/`);
+    const url = new URL(`${CC_FINDFACE_URL}/verify/`);
     url.searchParams.set("object1", `detection:${detectionId1}`);
     url.searchParams.set("object2", `detection:${detectionId2}`);
     const factory = RequestFactory.makeRequest(
@@ -173,14 +173,14 @@ export class DetectPrivateService {
     const formData = new FormData();
     {
       formData.append("fullframe", data, imageId);
-      formData.append("token", CC_FACEIDS_EVENT_TOKEN);
+      formData.append("token", CC_FINDFACE_EVENT_TOKEN);
       formData.append("rotate", "true");
-      formData.append("camera", CC_FACEIDS_EVENT_CAMERA);
+      formData.append("camera", CC_FINDFACE_EVENT_CAMERA);
       formData.append("mf_selector", "biggest");
     }
     const factory = RequestFactory.makeRequest(
       `detectPrivateService eventFace`,
-      `${CC_FACEIDS_URL}/events/faces/add/`,
+      `${CC_FINDFACE_URL}/events/faces/add/`,
       {
         method: "POST",
         headers: {
@@ -218,14 +218,14 @@ export class DetectPrivateService {
     const formData = new FormData();
     {
       formData.append("fullframe", blob, face.fileName);
-      formData.append("token", CC_FACEIDS_EVENT_TOKEN);
+      formData.append("token", CC_FINDFACE_EVENT_TOKEN);
       formData.append("rotate", "true");
-      formData.append("camera", CC_FACEIDS_EVENT_CAMERA);
+      formData.append("camera", CC_FINDFACE_EVENT_CAMERA);
       formData.append("mf_selector", "biggest");
     }
     const factory2 = RequestFactory.makeRequest(
       `detectPrivateService eventFaceByCardId face`,
-      `${CC_FACEIDS_URL}/events/faces/add/`,
+      `${CC_FINDFACE_URL}/events/faces/add/`,
       {
         method: "POST",
         headers: {
@@ -269,7 +269,7 @@ export class DetectPrivateService {
     );
     const factory = RequestFactory.makeRequest(
       `detectPrivateService detectLicensePlateByBlob`,
-      `${CC_FACEIDS_URL}/detect/`,
+      `${CC_FINDFACE_URL}/detect/`,
       {
         method: "POST",
         headers: {
@@ -349,7 +349,7 @@ export class DetectPrivateService {
     );
     const factory = RequestFactory.makeRequest(
       `detectPrivateService detectLicensePlateByBlob`,
-      `${CC_FACEIDS_URL}/detect/`,
+      `${CC_FINDFACE_URL}/detect/`,
       {
         method: "POST",
         headers: {

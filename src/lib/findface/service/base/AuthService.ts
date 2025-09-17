@@ -1,4 +1,4 @@
-import { CC_FACEIDS_URL, CC_FACEIDS_USER } from "../../config/params";
+import { CC_FINDFACE_URL, CC_FINDFACE_USER } from "../../config/params";
 import { inject } from "../../core/di";
 import { v4 as uuid } from "uuid";
 import LoggerService from "./LoggerService";
@@ -18,7 +18,7 @@ export class AuthService {
     this.loggerService.log("authService login", { login, password, context });
     const factory = RequestFactory.makeRequest(
       "authService login",
-      `${CC_FACEIDS_URL}/auth/login/`,
+      `${CC_FINDFACE_URL}/auth/login/`,
       {
         method: "POST",
         headers: {
@@ -41,7 +41,7 @@ export class AuthService {
     this.loggerService.log("authService logout", { token, context });
     const factory = RequestFactory.makeRequest(
       "authService logout",
-      `${CC_FACEIDS_URL}/auth/logout/`,
+      `${CC_FINDFACE_URL}/auth/logout/`,
       {
         method: "POST",
         headers: {
@@ -55,10 +55,10 @@ export class AuthService {
 
   public terminateOfflineSessions = async (token: string, context: Context) => {
     this.loggerService.log("authService terminateOfflineSessions", { token, context });
-    const url = new URL(`${CC_FACEIDS_URL}/sessions/`);
+    const url = new URL(`${CC_FINDFACE_URL}/sessions/`);
     url.searchParams.append("limit", "20");
     url.searchParams.append("status", "offline");
-    url.searchParams.append("user_name_in", CC_FACEIDS_USER);
+    url.searchParams.append("user_name_in", CC_FINDFACE_USER);
     const sessionEntries: { id: string }[][] = [];
     const fetchSessionPage = async (url: string) => {
       const factory = RequestFactory.makeRequest(
@@ -87,7 +87,7 @@ export class AuthService {
     for (const { id: sessionId } of sessionList) {
       const factory = RequestFactory.makeRequest(
         "authService terminateOfflineSessions terminate",
-        `${CC_FACEIDS_URL}/sessions/${sessionId}/`,
+        `${CC_FINDFACE_URL}/sessions/${sessionId}/`,
         {
           method: "DELETE",
           headers: {

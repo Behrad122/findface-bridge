@@ -2,7 +2,7 @@ import { inject } from "../../core/di";
 import LoggerService from "../base/LoggerService";
 import TokenService from "../base/TokenService";
 import TYPES from "../../config/types";
-import { CC_FACEIDS_URL } from "../../config/params";
+import { CC_FINDFACE_URL } from "../../config/params";
 import { TContextService } from "../base/ContextService";
 import RequestFactory from "../../common/RequestFactory";
 
@@ -19,7 +19,7 @@ export class CapturePrivateService {
     this.loggerService.logCtx(`capturePrivateService captureScreenshot`, {
       cameraId,
     });
-    const url = new URL(`${CC_FACEIDS_URL}/cameras/${cameraId}/screenshot/`);
+    const url = new URL(`${CC_FINDFACE_URL}/cameras/${cameraId}/screenshot/`);
     if (CAPTURE_WIDTH) {
       url.searchParams.set("width", String(CAPTURE_WIDTH));
     }

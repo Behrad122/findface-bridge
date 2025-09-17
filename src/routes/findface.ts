@@ -1,5 +1,5 @@
 import { minio } from "../lib/minio";
-import { faceids } from "../lib/faceids";
+import { findface } from "../lib/findface";
 import { errorData } from "functools-kit";
 import { app } from "../config/app";
 import { createLogger } from "pinolog";
@@ -18,20 +18,20 @@ import {
   RemoveFaceRequest,
   UpdateHumanCardRequest,
   VerifyFaceRequest,
-} from "../model/Faceids.model";
+} from "../model/FindFace.model";
 import { omit } from "lodash-es";
 import getErrorMessage from "../utils/getErrorMessage";
 
-const logger = createLogger("faceids_http.log");
+const logger = createLogger("findface_http.log");
 
-app.post("/api/v1/faceids/detectFace", async (ctx) => {
+app.post("/api/v1/findface/detectFace", async (ctx) => {
   const request = await ctx.req.json<DetectFaceRequest>();
-  console.time(`/api/v1/faceids/detectFace ${request.requestId}`);
-  logger.log("/api/v1/faceids/detectFace", {
+  console.time(`/api/v1/findface/detectFace ${request.requestId}`);
+  logger.log("/api/v1/findface/detectFace", {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await faceids.faceIdsGlobalService.detectFace({
+    const result = await findface.findFaceGlobalService.detectFace({
       ...request,
       data: {
         imageId: await minio.imageDataGlobalService.putObject(
@@ -46,7 +46,7 @@ app.post("/api/v1/faceids/detectFace", async (ctx) => {
         ),
       },
     });
-    logger.log("/api/v1/faceids/detectFace ok", {
+    logger.log("/api/v1/findface/detectFace ok", {
       request: omit(request, "data.imageBase64"),
       result,
     });
@@ -55,7 +55,7 @@ app.post("/api/v1/faceids/detectFace", async (ctx) => {
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/detectFace error", {
+    logger.log("/api/v1/findface/detectFace error", {
       request: omit(request, "data.imageBase64"),
       error: errorData(error),
     });
@@ -71,18 +71,18 @@ app.post("/api/v1/faceids/detectFace", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/detectFace ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/detectFace ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/detectLicensePlate", async (ctx) => {
+app.post("/api/v1/findface/detectLicensePlate", async (ctx) => {
   const request = await ctx.req.json<DetectLicensePlateRequest>();
-  console.time(`/api/v1/faceids/detectLicensePlate ${request.requestId}`);
-  logger.log("/api/v1/faceids/detectLicensePlate", {
+  console.time(`/api/v1/findface/detectLicensePlate ${request.requestId}`);
+  logger.log("/api/v1/findface/detectLicensePlate", {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await faceids.faceIdsGlobalService.detectLicensePlate({
+    const result = await findface.findFaceGlobalService.detectLicensePlate({
       ...request,
       data: {
         imageId: await minio.imageDataGlobalService.putObject(
@@ -97,7 +97,7 @@ app.post("/api/v1/faceids/detectLicensePlate", async (ctx) => {
         ),
       },
     });
-    logger.log("/api/v1/faceids/detectLicensePlate ok", {
+    logger.log("/api/v1/findface/detectLicensePlate ok", {
       request: omit(request, "data.imageBase64"),
       result,
     });
@@ -106,7 +106,7 @@ app.post("/api/v1/faceids/detectLicensePlate", async (ctx) => {
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/detectLicensePlate error", {
+    logger.log("/api/v1/findface/detectLicensePlate error", {
       request: omit(request, "data.imageBase64"),
       error: errorData(error),
     });
@@ -122,23 +122,23 @@ app.post("/api/v1/faceids/detectLicensePlate", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/detectLicensePlate ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/detectLicensePlate ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/verifyFace", async (ctx) => {
+app.post("/api/v1/findface/verifyFace", async (ctx) => {
   const request = await ctx.req.json<VerifyFaceRequest>();
-  console.time(`/api/v1/faceids/verifyFace ${request.requestId}`);
-  logger.log("/api/v1/faceids/verifyFace", { request });
+  console.time(`/api/v1/findface/verifyFace ${request.requestId}`);
+  logger.log("/api/v1/findface/verifyFace", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.verifyFace(request);
-    logger.log("/api/v1/faceids/verifyFace ok", { request, result });
+    const result = await findface.findFaceGlobalService.verifyFace(request);
+    logger.log("/api/v1/findface/verifyFace ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/verifyFace error", {
+    logger.log("/api/v1/findface/verifyFace error", {
       request,
       error: errorData(error),
     });
@@ -154,18 +154,18 @@ app.post("/api/v1/faceids/verifyFace", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/verifyFace ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/verifyFace ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/createFace", async (ctx) => {
+app.post("/api/v1/findface/createFace", async (ctx) => {
   const request = await ctx.req.json<CreateFaceRequest>();
-  console.time(`/api/v1/faceids/createFace ${request.requestId}`);
-  logger.log("/api/v1/faceids/createFace", {
+  console.time(`/api/v1/findface/createFace ${request.requestId}`);
+  logger.log("/api/v1/findface/createFace", {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await faceids.faceIdsGlobalService.createFace({
+    const result = await findface.findFaceGlobalService.createFace({
       ...request,
       data: {
         cardId: request.data.cardId,
@@ -181,7 +181,7 @@ app.post("/api/v1/faceids/createFace", async (ctx) => {
         ),
       },
     });
-    logger.log("/api/v1/faceids/createFace ok", {
+    logger.log("/api/v1/findface/createFace ok", {
       request: omit(request, "data.imageBase64"),
       result,
     });
@@ -190,7 +190,7 @@ app.post("/api/v1/faceids/createFace", async (ctx) => {
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/createFace error", {
+    logger.log("/api/v1/findface/createFace error", {
       request: omit(request, "data.imageBase64"),
       error: errorData(error),
     });
@@ -206,23 +206,23 @@ app.post("/api/v1/faceids/createFace", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/createFace ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/createFace ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/listFace", async (ctx) => {
+app.post("/api/v1/findface/listFace", async (ctx) => {
   const request = await ctx.req.json<ListFaceRequest>();
-  console.time(`/api/v1/faceids/listFace ${request.requestId}`);
-  logger.log("/api/v1/faceids/listFace", { request });
+  console.time(`/api/v1/findface/listFace ${request.requestId}`);
+  logger.log("/api/v1/findface/listFace", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.listFace(request);
-    logger.log("/api/v1/faceids/listFace ok", { request, result });
+    const result = await findface.findFaceGlobalService.listFace(request);
+    logger.log("/api/v1/findface/listFace ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/listFace error", {
+    logger.log("/api/v1/findface/listFace error", {
       request,
       error: errorData(error),
     });
@@ -238,23 +238,23 @@ app.post("/api/v1/faceids/listFace", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/listFace ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/listFace ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/removeFace", async (ctx) => {
+app.post("/api/v1/findface/removeFace", async (ctx) => {
   const request = await ctx.req.json<RemoveFaceRequest>();
-  console.time(`/api/v1/faceids/removeFace ${request.requestId}`);
-  logger.log("/api/v1/faceids/removeFace", { request });
+  console.time(`/api/v1/findface/removeFace ${request.requestId}`);
+  logger.log("/api/v1/findface/removeFace", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.removeFace(request);
-    logger.log("/api/v1/faceids/removeFace ok", { request, result });
+    const result = await findface.findFaceGlobalService.removeFace(request);
+    logger.log("/api/v1/findface/removeFace ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/removeFace error", {
+    logger.log("/api/v1/findface/removeFace error", {
       request,
       error: errorData(error),
     });
@@ -270,23 +270,23 @@ app.post("/api/v1/faceids/removeFace", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/removeFace ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/removeFace ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/findByDetection", async (ctx) => {
+app.post("/api/v1/findface/findByDetection", async (ctx) => {
   const request = await ctx.req.json<FindByDetectionRequest>();
-  console.time(`/api/v1/faceids/findByDetection ${request.requestId}`);
-  logger.log("/api/v1/faceids/findByDetection", { request });
+  console.time(`/api/v1/findface/findByDetection ${request.requestId}`);
+  logger.log("/api/v1/findface/findByDetection", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.findByDetection(request);
-    logger.log("/api/v1/faceids/findByDetection ok", { request, result });
+    const result = await findface.findFaceGlobalService.findByDetection(request);
+    logger.log("/api/v1/findface/findByDetection ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/findByDetection error", {
+    logger.log("/api/v1/findface/findByDetection error", {
       request,
       error: errorData(error),
     });
@@ -302,23 +302,23 @@ app.post("/api/v1/faceids/findByDetection", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/findByDetection ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/findByDetection ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/findByCardId", async (ctx) => {
+app.post("/api/v1/findface/findByCardId", async (ctx) => {
   const request = await ctx.req.json<FindByCardIdRequest>();
-  console.time(`/api/v1/faceids/findByCardId ${request.requestId}`);
-  logger.log("/api/v1/faceids/findByCardId", { request });
+  console.time(`/api/v1/findface/findByCardId ${request.requestId}`);
+  logger.log("/api/v1/findface/findByCardId", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.findByCardId(request);
-    logger.log("/api/v1/faceids/findByCardId ok", { request, result });
+    const result = await findface.findFaceGlobalService.findByCardId(request);
+    logger.log("/api/v1/findface/findByCardId ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/findByCardId error", {
+    logger.log("/api/v1/findface/findByCardId error", {
       request,
       error: errorData(error),
     });
@@ -334,23 +334,23 @@ app.post("/api/v1/faceids/findByCardId", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/findByCardId ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/findByCardId ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/createHumanCard", async (ctx) => {
+app.post("/api/v1/findface/createHumanCard", async (ctx) => {
   const request = await ctx.req.json<CreateHumanCardRequest>();
-  console.time(`/api/v1/faceids/createHumanCard ${request.requestId}`);
-  logger.log("/api/v1/faceids/createHumanCard", { request });
+  console.time(`/api/v1/findface/createHumanCard ${request.requestId}`);
+  logger.log("/api/v1/findface/createHumanCard", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.createHumanCard(request);
-    logger.log("/api/v1/faceids/createHumanCard ok", { request, result });
+    const result = await findface.findFaceGlobalService.createHumanCard(request);
+    logger.log("/api/v1/findface/createHumanCard ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/createHumanCard error", {
+    logger.log("/api/v1/findface/createHumanCard error", {
       request,
       error: errorData(error),
     });
@@ -366,23 +366,23 @@ app.post("/api/v1/faceids/createHumanCard", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/createHumanCard ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/createHumanCard ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/updateHumanCard", async (ctx) => {
+app.post("/api/v1/findface/updateHumanCard", async (ctx) => {
   const request = await ctx.req.json<UpdateHumanCardRequest>();
-  console.time(`/api/v1/faceids/updateHumanCard ${request.requestId}`);
-  logger.log("/api/v1/faceids/updateHumanCard", { request });
+  console.time(`/api/v1/findface/updateHumanCard ${request.requestId}`);
+  logger.log("/api/v1/findface/updateHumanCard", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.updateHumanCard(request);
-    logger.log("/api/v1/faceids/updateHumanCard ok", { request, result });
+    const result = await findface.findFaceGlobalService.updateHumanCard(request);
+    logger.log("/api/v1/findface/updateHumanCard ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/updateHumanCard error", {
+    logger.log("/api/v1/findface/updateHumanCard error", {
       request,
       error: errorData(error),
     });
@@ -398,18 +398,18 @@ app.post("/api/v1/faceids/updateHumanCard", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/updateHumanCard ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/updateHumanCard ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/eventFace", async (ctx) => {
+app.post("/api/v1/findface/eventFace", async (ctx) => {
   const request = await ctx.req.json<EventFaceRequest>();
-  console.time(`/api/v1/faceids/eventFace ${request.requestId}`);
-  logger.log("/api/v1/faceids/eventFace", {
+  console.time(`/api/v1/findface/eventFace ${request.requestId}`);
+  logger.log("/api/v1/findface/eventFace", {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await faceids.faceIdsGlobalService.eventFace({
+    const result = await findface.findFaceGlobalService.eventFace({
       ...request,
       data: {
         imageId: await minio.imageDataGlobalService.putObject(
@@ -424,7 +424,7 @@ app.post("/api/v1/faceids/eventFace", async (ctx) => {
         ),
       },
     });
-    logger.log("/api/v1/faceids/eventFace ok", {
+    logger.log("/api/v1/findface/eventFace ok", {
       request: omit(request, "data.imageBase64"),
       result,
     });
@@ -433,7 +433,7 @@ app.post("/api/v1/faceids/eventFace", async (ctx) => {
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/eventFace error", {
+    logger.log("/api/v1/findface/eventFace error", {
       request: omit(request, "data.imageBase64"),
       error: errorData(error),
     });
@@ -449,23 +449,23 @@ app.post("/api/v1/faceids/eventFace", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/eventFace ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/eventFace ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/eventFaceByCardId", async (ctx) => {
+app.post("/api/v1/findface/eventFaceByCardId", async (ctx) => {
   const request = await ctx.req.json<EventFaceByCardIdRequest>();
-  console.time(`/api/v1/faceids/eventFaceByCardId ${request.requestId}`);
-  logger.log("/api/v1/faceids/eventFaceByCardId", { request });
+  console.time(`/api/v1/findface/eventFaceByCardId ${request.requestId}`);
+  logger.log("/api/v1/findface/eventFaceByCardId", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.eventFaceByCardId(request);
-    logger.log("/api/v1/faceids/eventFaceByCardId ok", { request, result });
+    const result = await findface.findFaceGlobalService.eventFaceByCardId(request);
+    logger.log("/api/v1/findface/eventFaceByCardId ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/eventFaceByCardId error", {
+    logger.log("/api/v1/findface/eventFaceByCardId error", {
       request,
       error: errorData(error),
     });
@@ -481,18 +481,18 @@ app.post("/api/v1/faceids/eventFaceByCardId", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/eventFaceByCardId ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/eventFaceByCardId ${request.requestId}`);
   }
 });
 
-app.post("/api/v1/faceids/addHumanCardAttachment", async (ctx) => {
+app.post("/api/v1/findface/addHumanCardAttachment", async (ctx) => {
   const request = await ctx.req.json<AddHumanCardAttachmentRequest>();
-  console.time(`/api/v1/faceids/addHumanCardAttachment ${request.requestId}`);
-  logger.log("/api/v1/faceids/addHumanCardAttachment", {
+  console.time(`/api/v1/findface/addHumanCardAttachment ${request.requestId}`);
+  logger.log("/api/v1/findface/addHumanCardAttachment", {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await faceids.faceIdsGlobalService.addHumanCardAttachment({
+    const result = await findface.findFaceGlobalService.addHumanCardAttachment({
       ...request,
       data: {
         id: request.data.id,
@@ -508,7 +508,7 @@ app.post("/api/v1/faceids/addHumanCardAttachment", async (ctx) => {
         ),
       },
     });
-    logger.log("/api/v1/faceids/addHumanCardAttachment ok", {
+    logger.log("/api/v1/findface/addHumanCardAttachment ok", {
       request: omit(request, "data.imageBase64"),
       result,
     });
@@ -517,7 +517,7 @@ app.post("/api/v1/faceids/addHumanCardAttachment", async (ctx) => {
     }
     return ctx.json(result, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/addHumanCardAttachment error", {
+    logger.log("/api/v1/findface/addHumanCardAttachment error", {
       request: omit(request, "data.imageBase64"),
       error: errorData(error),
     });
@@ -534,18 +534,18 @@ app.post("/api/v1/faceids/addHumanCardAttachment", async (ctx) => {
     );
   } finally {
     console.timeEnd(
-      `/api/v1/faceids/addHumanCardAttachment ${request.requestId}`
+      `/api/v1/findface/addHumanCardAttachment ${request.requestId}`
     );
   }
 });
 
-app.post("/api/v1/faceids/captureScreenshot", async (ctx) => {
+app.post("/api/v1/findface/captureScreenshot", async (ctx) => {
   const request = await ctx.req.json<CaptureScreenshotRequest>();
-  console.time(`/api/v1/faceids/captureScreenshot ${request.requestId}`);
-  logger.log("/api/v1/faceids/captureScreenshot", { request });
+  console.time(`/api/v1/findface/captureScreenshot ${request.requestId}`);
+  logger.log("/api/v1/findface/captureScreenshot", { request });
   try {
-    const result = await faceids.faceIdsGlobalService.captureScreenshot(request);
-    logger.log("/api/v1/faceids/captureScreenshot ok", { request, result });
+    const result = await findface.findFaceGlobalService.captureScreenshot(request);
+    logger.log("/api/v1/findface/captureScreenshot ok", { request, result });
     if ("error" in result) {
       throw new Error(result.error);
     }
@@ -559,7 +559,7 @@ app.post("/api/v1/faceids/captureScreenshot", async (ctx) => {
       }
     }, 200);
   } catch (error) {
-    logger.log("/api/v1/faceids/captureScreenshot error", {
+    logger.log("/api/v1/findface/captureScreenshot error", {
       request,
       error: errorData(error),
     });
@@ -575,6 +575,6 @@ app.post("/api/v1/faceids/captureScreenshot", async (ctx) => {
       500
     );
   } finally {
-    console.timeEnd(`/api/v1/faceids/captureScreenshot ${request.requestId}`);
+    console.timeEnd(`/api/v1/findface/captureScreenshot ${request.requestId}`);
   }
 });

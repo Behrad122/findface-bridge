@@ -4,7 +4,7 @@ import { TContextService } from './ContextService';
 import TYPES from '../../config/types';
 import { omit } from 'lodash-es';
 
-const logger = createLogger("faceids.log");
+const logger = createLogger("findface.log");
 
 const USE_LOGS = false;
 

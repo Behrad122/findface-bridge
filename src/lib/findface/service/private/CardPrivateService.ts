@@ -2,13 +2,13 @@ import { inject } from "../../core/di";
 import LoggerService from "../base/LoggerService";
 import TYPES from "../../config/types";
 import TokenService from "../base/TokenService";
-import { CC_FACEIDS_URL } from "../../config/params";
+import { CC_FINDFACE_URL } from "../../config/params";
 import { IHumanCardDto, IHumanCardRow } from "../../model/HumanCard.model";
 import { IAttachment } from "../../model/Attachment.model";
 import { minio } from "../../../minio";
 import { TContextService } from "../base/ContextService";
 import RequestFactory from "../../common/RequestFactory";
-import { CC_FACEIDS_WATCHLIST } from "../../config/params";
+import { CC_FINDFACE_WATCHLIST } from "../../config/params";
 
 export class CardPrivateService {
   protected readonly loggerService = inject<LoggerService>(TYPES.loggerService);
@@ -23,9 +23,9 @@ export class CardPrivateService {
     this.loggerService.logCtx(`cardPrivateService findByDetection`, {
       detectionId,
     });
-    const url = new URL(`${CC_FACEIDS_URL}/cards/humans/`);
+    const url = new URL(`${CC_FINDFACE_URL}/cards/humans/`);
     url.searchParams.set("looks_like", `detection:${detectionId}`);
-    url.searchParams.set("watch_lists", String(CC_FACEIDS_WATCHLIST));
+    url.searchParams.set("watch_lists", String(CC_FINDFACE_WATCHLIST));
     url.searchParams.set("limit", "1");
     const factory = RequestFactory.makeRequest(
       `cardPrivateService findByDetection`,
@@ -59,7 +59,7 @@ export class CardPrivateService {
     });
     const factory = RequestFactory.makeRequest(
       `cardPrivateService findByCardId`,
-      `${CC_FACEIDS_URL}/cards/humans/${cardId}/`,
+      `${CC_FINDFACE_URL}/cards/humans/${cardId}/`,
       {
         method: "GET",
         headers: {
@@ -87,13 +87,13 @@ export class CardPrivateService {
     const { name, ...meta } = dto;
     const factory = RequestFactory.makeRequest(
       `cardPrivateService createHumanCard`,
-      `${CC_FACEIDS_URL}/cards/humans/`,
+      `${CC_FINDFACE_URL}/cards/humans/`,
       {
         method: "POST",
         headers: {
           Authorization: `Token ${this.tokenService.getToken()}`,
         },
-        body: JSON.stringify({ name, watch_lists: [CC_FACEIDS_WATCHLIST], meta }),
+        body: JSON.stringify({ name, watch_lists: [CC_FINDFACE_WATCHLIST], meta }),
       },
       this.contextService.context,
     );
@@ -118,13 +118,13 @@ export class CardPrivateService {
     const { name, ...meta } = dto;
     const factory = RequestFactory.makeRequest(
       `cardPrivateService updateHumanCard`,
-      `${CC_FACEIDS_URL}/cards/humans/${id}/`,
+      `${CC_FINDFACE_URL}/cards/humans/${id}/`,
       {
         method: "PATCH",
         headers: {
           Authorization: `Token ${this.tokenService.getToken()}`,
         },
-        body: JSON.stringify({ id, name, watch_lists: [CC_FACEIDS_WATCHLIST], meta }),
+        body: JSON.stringify({ id, name, watch_lists: [CC_FINDFACE_WATCHLIST], meta }),
       },
       this.contextService.context,
     );
@@ -156,7 +156,7 @@ export class CardPrivateService {
     formData.append("card", String(id));
     const factory = RequestFactory.makeRequest(
       `cardPrivateService addHumanCardAttachment`,
-      `${CC_FACEIDS_URL}/human-card-attachments/`,
+      `${CC_FINDFACE_URL}/human-card-attachments/`,
       {
         method: "POST",
         headers: {

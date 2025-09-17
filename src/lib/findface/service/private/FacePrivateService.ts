@@ -2,7 +2,7 @@ import TYPES from "../../config/types";
 import { inject } from "../../core/di";
 import LoggerService from "../base/LoggerService";
 import TokenService from "../base/TokenService";
-import { CC_FACEIDS_URL } from "../../config/params";
+import { CC_FINDFACE_URL } from "../../config/params";
 import { IFace } from "../../model/Face.model";
 import { minio } from "../../../minio";
 import { TContextService } from "../base/ContextService";
@@ -31,7 +31,7 @@ export class FacePrivateService {
     formData.append("card", String(cardId));
     const factory = RequestFactory.makeRequest(
       `facePrivateService createFace`,
-      `${CC_FACEIDS_URL}/objects/faces/`,
+      `${CC_FINDFACE_URL}/objects/faces/`,
       {
         method: "POST",
         headers: {
@@ -55,7 +55,7 @@ export class FacePrivateService {
     this.loggerService.logCtx(`facePrivateService listFace`, {
       cardId,
     });
-    const url = new URL(`${CC_FACEIDS_URL}/objects/faces/`);
+    const url = new URL(`${CC_FINDFACE_URL}/objects/faces/`);
     url.searchParams.set("card", String(cardId));
     url.searchParams.set("limit", "15");
     const factory = RequestFactory.makeRequest(
@@ -84,7 +84,7 @@ export class FacePrivateService {
     this.loggerService.logCtx(`facePrivateService removeFace`, {
       faceId,
     });
-    await fetch(`${CC_FACEIDS_URL}/objects/faces/${faceId}/`, {
+    await fetch(`${CC_FINDFACE_URL}/objects/faces/${faceId}/`, {
       method: "DELETE",
       headers: {
         Authorization: `Token ${this.tokenService.getToken()}`,

@@ -11,7 +11,7 @@ import { CardPublicService } from "../service/public/CardPublicService";
 import FacePublicService from "../service/public/FacePublicService";
 import DetectPublicService from "../service/public/DetectPublicService";
 import CapturePublicService from "../service/public/CapturePublicService";
-import FaceIdsGlobalService from "../service/global/FaceIdsGlobalService";
+import FindFaceGlobalService from "../service/global/FindFaceGlobalService";
 import ContextService from "../service/base/ContextService";
 import ErrorService from "../service/base/ErrorService";
 
@@ -38,5 +38,5 @@ import ErrorService from "../service/base/ErrorService";
 }
 
 {
-    provide(TYPES.faceIdsGlobalService, () => new FaceIdsGlobalService());
+    provide(TYPES.findFaceGlobalService, () => new FindFaceGlobalService());
 }
