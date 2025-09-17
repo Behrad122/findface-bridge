@@ -8,7 +8,7 @@ export const CC_FINDFACE_EVENT_TOKEN = process.env.CC_FINDFACE_EVENT_TOKEN || "1
 export const CC_FINDFACE_EVENT_CAMERA = process.env.CC_FINDFACE_EVENT_CAMERA || "2";
 export const CC_FINDFACE_WATCHLIST = parseInt(process.env.CC_FINDFACE_WATCHLIST) || 2;
 
-export const CC_ENABLE_TERMINATE_SESSIONS = !!process.env.CC_ENABLE_TERMINATE_SESSIONS || false;
+export const CC_ENABLE_TERMINATE_SESSIONS = !!parseInt(process.env.CC_ENABLE_TERMINATE_SESSIONS) || false;
 
 export const CC_MINIO_ENDPOINT = process.env.CC_MINIO_ENDPOINT || "localhost";
 export const CC_MINIO_PORT = parseInt(process.env.CC_MINIO_PORT) || 9002;

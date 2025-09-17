@@ -1,6 +1,82 @@
-# FaceIDS Bridge API
+# FindFace Bridge API
 
-REST API для работы с системой распознавания лиц FaceIDS.
+> REST API для работы с системой распознавания лиц FindFace.
+
+## Установка и запуск
+
+### Запуск с Docker Compose
+
+1. **Создайте файл `docker-compose.yml`:**
+```yaml
+version: "3.3"
+
+services:
+  app:
+    image: tripolskypetr/findface-bridge:latest
+    ports:
+      - "30050:30050"
+    environment:
+      - TZ=Europe/Moscow
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:30050/health_check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+```
+
+2. **Создайте файл конфигурации `.env`:**
+```env
+# Параметры подключения к FindFace
+CC_FINDFACE_URL=http://127.0.0.1
+CC_FINDFACE_USER=admin
+CC_FINDFACE_PASSWORD=password
+
+# Параметры событий
+CC_FINDFACE_EVENT_TOKEN=15ca64cd61e14022b7c6eecc8cfc4b63
+CC_FINDFACE_EVENT_CAMERA=2
+CC_FINDFACE_WATCHLIST=2
+
+# ID камеры
+CC_FINDFACE_CAMERA_ID=1
+
+# Дополнительные параметры
+CC_ENABLE_TERMINATE_SESSIONS=0
+
+# Параметры MinIO (для хранения изображений)
+CC_MINIO_ENDPOINT=localhost
+CC_MINIO_PORT=9002
+CC_MINIO_ACCESSKEY=minioadmin
+CC_MINIO_SECRETKEY=minioadmin
+```
+
+3. **Создайте папку для логов:**
+```bash
+mkdir logs
+```
+
+4. **Запустите контейнер:**
+```bash
+docker-compose up -d
+```
+
+### Ручной запуск Docker контейнера
+
+Запустите контейнер из готового образа:
+
+```bash
+docker run -d \
+  --name findface-bridge \
+  --network host \
+  --env-file .env \
+  -e Europe/Moscow \
+  --restart always \
+  tripolskypetr/findface-bridge:latest
+```
 
 ## Базовая структура запроса
 
@@ -526,3 +602,5 @@ curl -X POST http://localhost:3000/api/v1/findface/captureScreenshot \
 - Поля `serviceName`, `clientId`, `userId`, `requestId` обязательны для всех запросов
 - Время ответа может варьироваться в зависимости от размера изображения и сложности операции
 - API поддерживает только POST запросы
+- Приложение использует часовой пояс Asia/Tashkent по умолчанию
+- Health check проверяет доступность на `/health_check` каждые 30 секунд
