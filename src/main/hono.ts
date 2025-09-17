@@ -16,6 +16,7 @@ const main = () => {
   const server = serve({
     fetch: app.fetch,
     port: CC_FINDFACE_BRIDGE_PORT,
+    hostname: "0.0.0.0",
     createServer: (...args) => {
       const server = createServer(...args);
       server.maxConnections = MAX_CONNECTIONS;
@@ -25,7 +26,7 @@ const main = () => {
   });
 
   server.addListener("listening", () => {
-    console.log(`Server listening on http://localhost:${CC_FINDFACE_BRIDGE_PORT}`);
+    console.log(`Server listening on http://0.0.0.0:${CC_FINDFACE_BRIDGE_PORT}`);
   });
 
   injectWebSocket(server);
