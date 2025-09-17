@@ -5,6 +5,7 @@ import { app } from "../config/app";
 import { createLogger } from "pinolog";
 import {
   AddHumanCardAttachmentRequest,
+  CaptureScreenshotRequest,
   CreateFaceRequest,
   CreateHumanCardRequest,
   DetectFaceRequest,
@@ -535,5 +536,45 @@ app.post("/api/v1/faceids/addHumanCardAttachment", async (ctx) => {
     console.timeEnd(
       `/api/v1/faceids/addHumanCardAttachment ${request.requestId}`
     );
+  }
+});
+
+app.post("/api/v1/faceids/captureScreenshot", async (ctx) => {
+  const request = await ctx.req.json<CaptureScreenshotRequest>();
+  console.time(`/api/v1/faceids/captureScreenshot ${request.requestId}`);
+  logger.log("/api/v1/faceids/captureScreenshot", { request });
+  try {
+    const result = await faceids.faceIdsGlobalService.captureScreenshot(request);
+    logger.log("/api/v1/faceids/captureScreenshot ok", { request, result });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    const imageBuffer = await result.data.arrayBuffer();
+    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+    return ctx.json({
+      ...result,
+      data: {
+        imageBase64,
+        contentType: result.data.type || 'image/jpeg'
+      }
+    }, 200);
+  } catch (error) {
+    logger.log("/api/v1/faceids/captureScreenshot error", {
+      request,
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/faceids/captureScreenshot ${request.requestId}`);
   }
 });

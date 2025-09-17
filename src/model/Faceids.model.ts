@@ -65,6 +65,18 @@ export interface DetectLicensePlateData {
   imageName: string;
 }
 
+export interface CaptureScreenshotRequest {
+  serviceName: string;
+  clientId: string;
+  userId: string;
+  requestId: string;
+  data: CaptureScreenshotData;
+}
+
+export interface CaptureScreenshotData {
+  cameraId: number;
+}
+
 export interface VerifyFaceRequest {
   serviceName: string;
   clientId: string;
