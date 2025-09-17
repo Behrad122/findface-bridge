@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.19-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -7,6 +7,6 @@ RUN apk add --no-cache curl
 COPY build ./build
 COPY package.json .
 
-RUN bun install --ignore-scripts --verbose
+RUN npm install --ignore-scripts --verbose
 
-CMD ["bun", "./build/index.mjs"]
+CMD ["node", "./build/index.mjs"]
