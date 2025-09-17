@@ -1,7 +1,7 @@
 import { serve } from "@hono/node-server";
 import { app, injectWebSocket } from "../config/app";
 
-import { CC_FINDFACE_BRIDGE_PORT } from "../lib/findface/config/params";
+import { CC_FINDFACE_BRIDGE_HOST, CC_FINDFACE_BRIDGE_PORT } from "../lib/findface/config/params";
 
 import { createServer } from "http";
 
@@ -16,7 +16,7 @@ const main = () => {
   const server = serve({
     fetch: app.fetch,
     port: CC_FINDFACE_BRIDGE_PORT,
-    hostname: "0.0.0.0",
+    hostname: CC_FINDFACE_BRIDGE_HOST,
     createServer: (...args) => {
       const server = createServer(...args);
       server.maxConnections = MAX_CONNECTIONS;

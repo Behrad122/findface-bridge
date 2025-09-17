@@ -197,6 +197,35 @@ export class DetectPrivateService {
     };
   };
 
+  public eventFaceByBlob = async (blob: Blob): Promise<IFaceEvent> => {
+    this.loggerService.logCtx(`detectPrivateService eventFaceByBlob`);
+    const formData = new FormData();
+    {
+      formData.append("fullframe", blob, "image.png");
+      formData.append("token", CC_FINDFACE_EVENT_TOKEN);
+      formData.append("rotate", "true");
+      formData.append("camera", CC_FINDFACE_EVENT_CAMERA);
+      formData.append("mf_selector", "biggest");
+    }
+    const factory = RequestFactory.makeRequest(
+      `detectPrivateService eventFaceByBlob`,
+      `${CC_FINDFACE_URL}/events/faces/add/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${this.tokenService.getToken()}`,
+        },
+        body: formData,
+      },
+      this.contextService.context
+    );
+    const response = await factory.fetch();
+    const output = <any>await response.json();
+    return {
+      events: output.events,
+    };
+  };
+
   public eventFaceByCardId = async (cardId: string): Promise<IFaceEvent> => {
     this.loggerService.logCtx(`detectPrivateService eventFaceByCardId`);
     const [face = null] = await this.facePrivateService.listFace(cardId);

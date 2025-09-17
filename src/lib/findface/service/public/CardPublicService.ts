@@ -83,6 +83,20 @@ export class CardPublicService implements TCardPublicService {
       delay: 10,
     }
   );
+
+  public addHumanCardAttachmentByBlob = execpool(
+    retry(async (id: number, blob: Blob, fileName: string = "image.png") => {
+      this.loggerService.logCtx("cardPublicService addHumanCardAttachmentByBlob", {
+        id,
+        fileName,
+      });
+      return await this.cardPrivateService.addHumanCardAttachmentByBlob(id, blob, fileName);
+    }),
+    {
+      maxExec: 35,
+      delay: 10,
+    }
+  );
 }
 
 export default CardPrivateService;

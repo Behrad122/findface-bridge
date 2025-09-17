@@ -32,6 +32,19 @@ export class FacePublicService implements TFacePublicService {
     }
   );
 
+  public createFaceByBlob = execpool<IFace | typeof CANCELED_PROMISE_SYMBOL>(
+    retry(async (cardId: string, blob: Blob) => {
+      this.loggerService.logCtx("facePublicService createFaceByBlob", {
+        cardId,
+      });
+      return await this.facePrivateService.createFaceByBlob(cardId, blob);
+    }),
+    {
+      maxExec: 35,
+      delay: 10,
+    }
+  );
+
   public listFace = execpool(
     retry(async (cardId: string) => {
       this.loggerService.logCtx("facePublicService listFace", {

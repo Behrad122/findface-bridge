@@ -411,6 +411,66 @@ export class ListenerService
     );
   };
 
+  public eventFaceByBlob = async (request: TRequest<{ blob: Blob }>) => {
+    this.loggerService.log("findFaceGlobalService eventFaceByBlob", { request });
+    return await ContextService.runInContext(
+      async (): Promise<TResponse<IFaceEvent>> => {
+        try {
+          const data = await this.detectPublicService.eventFaceByBlob(
+            request.data.blob
+          );
+          if (data === CANCELED_PROMISE_SYMBOL) {
+            throw new Error("request canceled");
+          }
+          this.loggerService.log("findFaceGlobalService eventFaceByBlob ok", {
+            request,
+            data,
+          });
+          return {
+            status: "ok",
+            serviceName: request.serviceName,
+            clientId: request.clientId,
+            userId: request.userId,
+            requestId: request.requestId,
+            data,
+          };
+        } catch (error: any) {
+          if (error?.statusCode === 401 || error?.statusCode === 403) {
+            this.loggerService.log("findFaceGlobalService eventFaceByBlob 401", {
+              request,
+            });
+            this.getToken.clear();
+            return await this.eventFaceByBlob(request);
+          }
+          this.loggerService.log("findFaceGlobalService eventFaceByBlob error", {
+            request,
+            error: errorData(error),
+          });
+          return {
+            status: "error",
+            error: getErrorMessage(error),
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          };
+        }
+      },
+      {
+        clientId: request.clientId,
+        serviceName: request.serviceName,
+        requestId: request.userId,
+        userId: request.userId,
+        token: await this.getToken({
+          clientId: request.clientId,
+          requestId: request.requestId,
+          serviceName: request.serviceName,
+          userId: request.userId,
+        }),
+      }
+    );
+  };
+
   public eventFaceByCardId = async (request: TRequest<{ cardId: string }>) => {
     this.loggerService.log("findFaceGlobalService eventFaceByCardId", { request });
     return await ContextService.runInContext(
@@ -506,6 +566,69 @@ export class ListenerService
             return await this.createFace(request);
           }
           this.loggerService.log("findFaceGlobalService createFace error", {
+            request,
+            error: errorData(error),
+          });
+          return {
+            status: "error",
+            error: getErrorMessage(error),
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          };
+        }
+      },
+      {
+        clientId: request.clientId,
+        serviceName: request.serviceName,
+        requestId: request.userId,
+        userId: request.userId,
+        token: await this.getToken({
+          clientId: request.clientId,
+          requestId: request.requestId,
+          serviceName: request.serviceName,
+          userId: request.userId,
+        }),
+      }
+    );
+  };
+
+  public createFaceByBlob = async (
+    request: TRequest<{ cardId: string; blob: Blob }>
+  ) => {
+    this.loggerService.log("findFaceGlobalService createFaceByBlob", { request });
+    return await ContextService.runInContext(
+      async (): Promise<TResponse<IFace>> => {
+        try {
+          const data = await this.facePublicService.createFaceByBlob(
+            request.data.cardId,
+            request.data.blob
+          );
+          if (data === CANCELED_PROMISE_SYMBOL) {
+            throw new Error("request canceled");
+          }
+          this.loggerService.log("findFaceGlobalService createFaceByBlob ok", {
+            request,
+            data,
+          });
+          return {
+            status: "ok",
+            serviceName: request.serviceName,
+            clientId: request.clientId,
+            userId: request.userId,
+            requestId: request.requestId,
+            data,
+          };
+        } catch (error: any) {
+          if (error?.statusCode === 401 || error?.statusCode === 403) {
+            this.loggerService.log("findFaceGlobalService createFaceByBlob 401", {
+              request,
+            });
+            this.getToken.clear();
+            return await this.createFaceByBlob(request);
+          }
+          this.loggerService.log("findFaceGlobalService createFaceByBlob error", {
             request,
             error: errorData(error),
           });
@@ -936,6 +1059,73 @@ export class ListenerService
           }
           this.loggerService.log(
             "findFaceGlobalService addHumanCardAttachment error",
+            { request, error: errorData(error) }
+          );
+          return {
+            status: "error",
+            error: getErrorMessage(error),
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          };
+        }
+      },
+      {
+        clientId: request.clientId,
+        serviceName: request.serviceName,
+        requestId: request.userId,
+        userId: request.userId,
+        token: await this.getToken({
+          clientId: request.clientId,
+          serviceName: request.serviceName,
+          requestId: request.userId,
+          userId: request.userId,
+        }),
+      }
+    );
+  };
+
+  public addHumanCardAttachmentByBlob = async (
+    request: TRequest<{ id: number; blob: Blob; fileName?: string }>
+  ) => {
+    this.loggerService.log("findFaceGlobalService addHumanCardAttachmentByBlob", {
+      request,
+    });
+    return await ContextService.runInContext(
+      async (): Promise<TResponse<IAttachment>> => {
+        try {
+          const data = await this.cardPublicService.addHumanCardAttachmentByBlob(
+            request.data.id,
+            request.data.blob,
+            request.data.fileName
+          );
+          if (data === CANCELED_PROMISE_SYMBOL) {
+            throw new Error("request canceled");
+          }
+          this.loggerService.log("findFaceGlobalService addHumanCardAttachmentByBlob ok", {
+            request,
+            data,
+          });
+          return {
+            status: "ok",
+            serviceName: request.serviceName,
+            clientId: request.clientId,
+            userId: request.userId,
+            requestId: request.requestId,
+            data,
+          };
+        } catch (error: any) {
+          if (error?.statusCode === 401 || error?.statusCode === 403) {
+            this.loggerService.log(
+              "findFaceGlobalService addHumanCardAttachmentByBlob 401",
+              { request }
+            );
+            this.getToken.clear();
+            return await this.addHumanCardAttachmentByBlob(request);
+          }
+          this.loggerService.log(
+            "findFaceGlobalService addHumanCardAttachmentByBlob error",
             { request, error: errorData(error) }
           );
           return {

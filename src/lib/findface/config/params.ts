@@ -1,6 +1,7 @@
 declare function parseInt(value: unknown): number;
 
 export const CC_FINDFACE_BRIDGE_PORT = parseInt(process.env.CC_FINDFACE_BRIDGE_PORT) || 20050;
+export const CC_FINDFACE_BRIDGE_HOST = process.env.CC_FINDFACE_BRIDGE_HOST || "0.0.0.0";
 
 export const CC_FINDFACE_URL = process.env.CC_FINDFACE_URL || "http://192.168.14.55";
 export const CC_FINDFACE_USER = process.env.CC_FINDFACE_USER || "services_node";

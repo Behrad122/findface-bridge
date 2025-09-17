@@ -31,20 +31,11 @@ app.post("/api/v1/findface/detectFace", async (ctx) => {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await findface.findFaceGlobalService.detectFace({
+    const imageBuffer = Buffer.from(request.data.imageBase64, 'base64');
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    const result = await findface.findFaceGlobalService.detectFaceByBlob({
       ...request,
-      data: {
-        imageId: await minio.imageDataGlobalService.putObject(
-          request.data.imageBase64,
-          request.data.imageName,
-          {
-            clientId: request.clientId,
-            requestId: request.requestId,
-            serviceName: request.serviceName,
-            userId: request.userId,
-          }
-        ),
-      },
+      data: { blob },
     });
     logger.log("/api/v1/findface/detectFace ok", {
       request: omit(request, "data.imageBase64"),
@@ -75,14 +66,14 @@ app.post("/api/v1/findface/detectFace", async (ctx) => {
   }
 });
 
-app.post("/api/v1/findface/detectLicensePlate", async (ctx) => {
-  const request = await ctx.req.json<DetectLicensePlateRequest>();
-  console.time(`/api/v1/findface/detectLicensePlate ${request.requestId}`);
-  logger.log("/api/v1/findface/detectLicensePlate", {
+app.post("/api/v1/findface/detectFaceMinio", async (ctx) => {
+  const request = await ctx.req.json<DetectFaceRequest>();
+  console.time(`/api/v1/findface/detectFaceMinio ${request.requestId}`);
+  logger.log("/api/v1/findface/detectFaceMinio", {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await findface.findFaceGlobalService.detectLicensePlate({
+    const result = await findface.findFaceGlobalService.detectFace({
       ...request,
       data: {
         imageId: await minio.imageDataGlobalService.putObject(
@@ -96,6 +87,48 @@ app.post("/api/v1/findface/detectLicensePlate", async (ctx) => {
           }
         ),
       },
+    });
+    logger.log("/api/v1/findface/detectFaceMinio ok", {
+      request: omit(request, "data.imageBase64"),
+      result,
+    });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/detectFaceMinio error", {
+      request: omit(request, "data.imageBase64"),
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/findface/detectFaceMinio ${request.requestId}`);
+  }
+});
+
+app.post("/api/v1/findface/detectLicensePlate", async (ctx) => {
+  const request = await ctx.req.json<DetectLicensePlateRequest>();
+  console.time(`/api/v1/findface/detectLicensePlate ${request.requestId}`);
+  logger.log("/api/v1/findface/detectLicensePlate", {
+    request: omit(request, "data.imageBase64"),
+  });
+  try {
+    const imageBuffer = Buffer.from(request.data.imageBase64, 'base64');
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    const result = await findface.findFaceGlobalService.detectLicensePlateByBlob({
+      ...request,
+      data: { imageFile: blob },
     });
     logger.log("/api/v1/findface/detectLicensePlate ok", {
       request: omit(request, "data.imageBase64"),
@@ -123,6 +156,57 @@ app.post("/api/v1/findface/detectLicensePlate", async (ctx) => {
     );
   } finally {
     console.timeEnd(`/api/v1/findface/detectLicensePlate ${request.requestId}`);
+  }
+});
+
+app.post("/api/v1/findface/detectLicensePlateMinio", async (ctx) => {
+  const request = await ctx.req.json<DetectLicensePlateRequest>();
+  console.time(`/api/v1/findface/detectLicensePlateMinio ${request.requestId}`);
+  logger.log("/api/v1/findface/detectLicensePlateMinio", {
+    request: omit(request, "data.imageBase64"),
+  });
+  try {
+    const result = await findface.findFaceGlobalService.detectLicensePlate({
+      ...request,
+      data: {
+        imageId: await minio.imageDataGlobalService.putObject(
+          request.data.imageBase64,
+          request.data.imageName,
+          {
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          }
+        ),
+      },
+    });
+    logger.log("/api/v1/findface/detectLicensePlateMinio ok", {
+      request: omit(request, "data.imageBase64"),
+      result,
+    });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/detectLicensePlateMinio error", {
+      request: omit(request, "data.imageBase64"),
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/findface/detectLicensePlateMinio ${request.requestId}`);
   }
 });
 
@@ -165,20 +249,13 @@ app.post("/api/v1/findface/createFace", async (ctx) => {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await findface.findFaceGlobalService.createFace({
+    const imageBuffer = Buffer.from(request.data.imageBase64, 'base64');
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    const result = await findface.findFaceGlobalService.createFaceByBlob({
       ...request,
       data: {
         cardId: request.data.cardId,
-        imageId: await minio.imageDataGlobalService.putObject(
-          request.data.imageBase64,
-          request.data.imageName,
-          {
-            clientId: request.clientId,
-            requestId: request.requestId,
-            serviceName: request.serviceName,
-            userId: request.userId,
-          }
-        ),
+        blob,
       },
     });
     logger.log("/api/v1/findface/createFace ok", {
@@ -207,6 +284,58 @@ app.post("/api/v1/findface/createFace", async (ctx) => {
     );
   } finally {
     console.timeEnd(`/api/v1/findface/createFace ${request.requestId}`);
+  }
+});
+
+app.post("/api/v1/findface/createFaceMinio", async (ctx) => {
+  const request = await ctx.req.json<CreateFaceRequest>();
+  console.time(`/api/v1/findface/createFaceMinio ${request.requestId}`);
+  logger.log("/api/v1/findface/createFaceMinio", {
+    request: omit(request, "data.imageBase64"),
+  });
+  try {
+    const result = await findface.findFaceGlobalService.createFace({
+      ...request,
+      data: {
+        cardId: request.data.cardId,
+        imageId: await minio.imageDataGlobalService.putObject(
+          request.data.imageBase64,
+          request.data.imageName,
+          {
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          }
+        ),
+      },
+    });
+    logger.log("/api/v1/findface/createFaceMinio ok", {
+      request: omit(request, "data.imageBase64"),
+      result,
+    });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/createFaceMinio error", {
+      request: omit(request, "data.imageBase64"),
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/findface/createFaceMinio ${request.requestId}`);
   }
 });
 
@@ -409,20 +538,11 @@ app.post("/api/v1/findface/eventFace", async (ctx) => {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await findface.findFaceGlobalService.eventFace({
+    const imageBuffer = Buffer.from(request.data.imageBase64, 'base64');
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    const result = await findface.findFaceGlobalService.eventFaceByBlob({
       ...request,
-      data: {
-        imageId: await minio.imageDataGlobalService.putObject(
-          request.data.imageBase64,
-          request.data.imageName,
-          {
-            clientId: request.clientId,
-            requestId: request.requestId,
-            serviceName: request.serviceName,
-            userId: request.userId,
-          }
-        ),
-      },
+      data: { blob },
     });
     logger.log("/api/v1/findface/eventFace ok", {
       request: omit(request, "data.imageBase64"),
@@ -450,6 +570,57 @@ app.post("/api/v1/findface/eventFace", async (ctx) => {
     );
   } finally {
     console.timeEnd(`/api/v1/findface/eventFace ${request.requestId}`);
+  }
+});
+
+app.post("/api/v1/findface/eventFaceMinio", async (ctx) => {
+  const request = await ctx.req.json<EventFaceRequest>();
+  console.time(`/api/v1/findface/eventFaceMinio ${request.requestId}`);
+  logger.log("/api/v1/findface/eventFaceMinio", {
+    request: omit(request, "data.imageBase64"),
+  });
+  try {
+    const result = await findface.findFaceGlobalService.eventFace({
+      ...request,
+      data: {
+        imageId: await minio.imageDataGlobalService.putObject(
+          request.data.imageBase64,
+          request.data.imageName,
+          {
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          }
+        ),
+      },
+    });
+    logger.log("/api/v1/findface/eventFaceMinio ok", {
+      request: omit(request, "data.imageBase64"),
+      result,
+    });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/eventFaceMinio error", {
+      request: omit(request, "data.imageBase64"),
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/findface/eventFaceMinio ${request.requestId}`);
   }
 });
 
@@ -492,20 +663,14 @@ app.post("/api/v1/findface/addHumanCardAttachment", async (ctx) => {
     request: omit(request, "data.imageBase64"),
   });
   try {
-    const result = await findface.findFaceGlobalService.addHumanCardAttachment({
+    const imageBuffer = Buffer.from(request.data.imageBase64, 'base64');
+    const blob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    const result = await findface.findFaceGlobalService.addHumanCardAttachmentByBlob({
       ...request,
       data: {
         id: request.data.id,
-        imageId: await minio.imageDataGlobalService.putObject(
-          request.data.imageBase64,
-          request.data.imageName,
-          {
-            clientId: request.clientId,
-            requestId: request.requestId,
-            serviceName: request.serviceName,
-            userId: request.userId,
-          }
-        ),
+        blob,
+        fileName: request.data.imageName,
       },
     });
     logger.log("/api/v1/findface/addHumanCardAttachment ok", {
@@ -535,6 +700,60 @@ app.post("/api/v1/findface/addHumanCardAttachment", async (ctx) => {
   } finally {
     console.timeEnd(
       `/api/v1/findface/addHumanCardAttachment ${request.requestId}`
+    );
+  }
+});
+
+app.post("/api/v1/findface/addHumanCardAttachmentMinio", async (ctx) => {
+  const request = await ctx.req.json<AddHumanCardAttachmentRequest>();
+  console.time(`/api/v1/findface/addHumanCardAttachmentMinio ${request.requestId}`);
+  logger.log("/api/v1/findface/addHumanCardAttachmentMinio", {
+    request: omit(request, "data.imageBase64"),
+  });
+  try {
+    const result = await findface.findFaceGlobalService.addHumanCardAttachment({
+      ...request,
+      data: {
+        id: request.data.id,
+        imageId: await minio.imageDataGlobalService.putObject(
+          request.data.imageBase64,
+          request.data.imageName,
+          {
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          }
+        ),
+      },
+    });
+    logger.log("/api/v1/findface/addHumanCardAttachmentMinio ok", {
+      request: omit(request, "data.imageBase64"),
+      result,
+    });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/addHumanCardAttachmentMinio error", {
+      request: omit(request, "data.imageBase64"),
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(
+      `/api/v1/findface/addHumanCardAttachmentMinio ${request.requestId}`
     );
   }
 });

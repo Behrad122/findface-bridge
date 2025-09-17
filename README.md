@@ -554,6 +554,18 @@ docker run -d \
 }
 ```
 
+## Debug Minio-endpoints
+
+Для отладки доступны специальные endpoints, которые сохраняют изображения в MinIO лог:
+
+- `/api/v1/findface/detectFaceMinio` - аналог `/api/v1/findface/detectFace`
+- `/api/v1/findface/detectLicensePlateMinio` - аналог `/api/v1/findface/detectLicensePlate`
+- `/api/v1/findface/createFaceMinio` - аналог `/api/v1/findface/createFace`
+- `/api/v1/findface/eventFaceMinio` - аналог `/api/v1/findface/eventFace`
+- `/api/v1/findface/addHumanCardAttachmentMinio` - аналог `/api/v1/findface/addHumanCardAttachment`
+
+Данные endpoints полностью идентичны основным по API, но дополнительно сохраняют переданные изображения в MinIO для возможности отладки и анализа.
+
 ## Примеры использования
 
 ### Распознавание лица на изображении

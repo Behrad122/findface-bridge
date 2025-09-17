@@ -51,6 +51,38 @@ export class FacePrivateService {
     };
   };
 
+  public createFaceByBlob = async (
+    cardId: string,
+    blob: Blob
+  ): Promise<IFace> => {
+    this.loggerService.logCtx(`facePrivateService createFaceByBlob`, {
+      cardId,
+    });
+    const formData = new FormData();
+    formData.append("source_photo", blob, "image.png");
+    formData.append("card", String(cardId));
+    const factory = RequestFactory.makeRequest(
+      `facePrivateService createFaceByBlob`,
+      `${CC_FINDFACE_URL}/objects/faces/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${this.tokenService.getToken()}`,
+        },
+        body: formData,
+      },
+      this.contextService.context,
+    );
+    const response = await factory.fetch();
+    const output = <any>await response.json();
+    return {
+      faceId: output.id,
+      fileName: output.source_photo_name,
+      src: output.source_photo,
+      thumbnail: output.thumbnail,
+    };
+  };
+
   public listFace = async (cardId: string): Promise<IFace[]> => {
     this.loggerService.logCtx(`facePrivateService listFace`, {
       cardId,

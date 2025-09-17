@@ -59,6 +59,17 @@ export class DetectPublicService implements TDetectPublicService {
     }
   );
 
+  public eventFaceByBlob = execpool<IFaceEvent | typeof CANCELED_PROMISE_SYMBOL>(
+    retry(async (blob: Blob) => {
+      this.loggerService.logCtx("detectPublicService eventFaceByBlob");
+      return await this.detectPrivateService.eventFaceByBlob(blob);
+    }),
+    {
+      maxExec: 35,
+      delay: 10,
+    }
+  );
+
   public eventFaceByCardId = execpool<IFaceEvent | typeof CANCELED_PROMISE_SYMBOL>(
     retry(async (cardId: string) => {
       this.loggerService.logCtx("detectPublicService eventFaceByCardId", {

@@ -173,6 +173,39 @@ export class CardPrivateService {
       fileName,
     };
   };
+
+  public addHumanCardAttachmentByBlob = async (
+    id: number,
+    blob: Blob,
+    fileName: string = "image.png"
+  ): Promise<IAttachment> => {
+    this.loggerService.logCtx(`cardPrivateService addHumanCardAttachmentByBlob`, {
+      id,
+      fileName,
+    });
+    const formData = new FormData();
+    formData.append("name", fileName);
+    formData.append("file", blob, fileName);
+    formData.append("card", String(id));
+    const factory = RequestFactory.makeRequest(
+      `cardPrivateService addHumanCardAttachmentByBlob`,
+      `${CC_FINDFACE_URL}/human-card-attachments/`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${this.tokenService.getToken()}`,
+        },
+        body: formData,
+      },
+      this.contextService.context,
+    );
+    const response = await factory.fetch();
+    const { id: fileId, name: returnedFileName } = <any>await response.json();
+    return {
+      fileId,
+      fileName: returnedFileName,
+    };
+  };
 }
 
 export default CardPrivateService;
