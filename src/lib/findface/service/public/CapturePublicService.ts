@@ -22,7 +22,12 @@ export class CapturePublicService implements TCapturePublicService {
       this.loggerService.logCtx("capturePublicService captureScreenshot", {
         cameraId,
       });
-      return await this.capturePrivateService.captureScreenshot(cameraId);
+      try {
+        return await this.capturePrivateService.captureScreenshot(cameraId);
+      } catch (error) {
+        this.capturePrivateService.captureScreenshot.clear(`${cameraId}`);
+        throw error;
+      }
     }),
     {
       maxExec: 35,
