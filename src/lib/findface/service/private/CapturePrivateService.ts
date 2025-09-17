@@ -5,8 +5,10 @@ import TYPES from "../../config/types";
 import { CC_FINDFACE_URL } from "../../config/params";
 import { TContextService } from "../base/ContextService";
 import RequestFactory from "../../common/RequestFactory";
+import { ttl } from "functools-kit";
 
 const CAPTURE_WIDTH = 0;
+const CAPTURE_DELAY = 1_000;
 
 export class CapturePrivateService {
   protected readonly loggerService = inject<LoggerService>(TYPES.loggerService);
@@ -15,7 +17,7 @@ export class CapturePrivateService {
     TYPES.contextService
   );
 
-  public captureScreenshot = async (cameraId: number): Promise<Blob> => {
+  public captureScreenshot = ttl(async (cameraId: number): Promise<Blob> => {
     this.loggerService.logCtx(`capturePrivateService captureScreenshot`, {
       cameraId,
     });
@@ -37,7 +39,10 @@ export class CapturePrivateService {
     );
     const response = await factory.fetch();
     return await response.blob();
-  };
+  }, {
+    key: ([cameraId]) => `${cameraId}`,
+    timeout: CAPTURE_DELAY,
+  });
 }
 
 export default CapturePrivateService;
