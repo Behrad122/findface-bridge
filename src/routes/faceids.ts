@@ -8,6 +8,7 @@ import {
   CreateFaceRequest,
   CreateHumanCardRequest,
   DetectFaceRequest,
+  DetectLicensePlateRequest,
   EventFaceByCardIdRequest,
   EventFaceRequest,
   FindByCardIdRequest,
@@ -70,6 +71,57 @@ app.post("/api/v1/faceids/detectFace", async (ctx) => {
     );
   } finally {
     console.timeEnd(`/api/v1/faceids/detectFace ${request.requestId}`);
+  }
+});
+
+app.post("/api/v1/faceids/detectLicensePlate", async (ctx) => {
+  const request = await ctx.req.json<DetectLicensePlateRequest>();
+  console.time(`/api/v1/faceids/detectLicensePlate ${request.requestId}`);
+  logger.log("/api/v1/faceids/detectLicensePlate", {
+    request: omit(request, "data.imageBase64"),
+  });
+  try {
+    const result = await faceids.faceIdsGlobalService.detectLicensePlate({
+      ...request,
+      data: {
+        imageId: await minio.imageDataGlobalService.putObject(
+          request.data.imageBase64,
+          request.data.imageName,
+          {
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          }
+        ),
+      },
+    });
+    logger.log("/api/v1/faceids/detectLicensePlate ok", {
+      request: omit(request, "data.imageBase64"),
+      result,
+    });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/faceids/detectLicensePlate error", {
+      request: omit(request, "data.imageBase64"),
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/faceids/detectLicensePlate ${request.requestId}`);
   }
 });
 

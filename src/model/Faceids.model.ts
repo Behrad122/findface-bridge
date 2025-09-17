@@ -52,6 +52,19 @@ export interface DetectFaceData {
   imageName: string;
 }
 
+export interface DetectLicensePlateRequest {
+  serviceName: string;
+  clientId: string;
+  userId: string;
+  requestId: string;
+  data: DetectLicensePlateData;
+}
+
+export interface DetectLicensePlateData {
+  imageBase64: string;
+  imageName: string;
+}
+
 export interface VerifyFaceRequest {
   serviceName: string;
   clientId: string;
