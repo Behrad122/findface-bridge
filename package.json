@@ -13,9 +13,6 @@
   "scripts": {
     "build": "rollup -c",
     "start": "npm run build && dotenv -e .env -- bun ./build/index.mjs",
-    "start:launcher": "npm run start:launcher:x",
-    "start:launcher:x": "npm run build:modules:x && dotenv -e .env -- bun ./index.cjs",
-    "start:launcher:win": "npm run build:modules:win && dotenv -e .env -- bun ./index.cjs",
     "start:debug": "npm run build && dotenv -e .env -- bun --inspect-brk ./build/index.mjs --repl",
     "start:repl": "npm run build && dotenv -e .env -- bun ./scripts/repl.ts --repl"
   },
