@@ -5,6 +5,14 @@ import TYPES from "../../config/types";
 import { CANCELED_PROMISE_SYMBOL, execpool, retry } from "functools-kit";
 import LoggerService from "../base/LoggerService";
 
+const RETRY_COUNT = 5;
+const RETRY_DELAY = 1_000;
+const RETRY_CONDITION = (error) =>
+  error?.statusCode !== 401 && error?.statusCode !== 403;
+
+const MAX_EXEC = 50;
+const EXEC_DELAY = 0;
+
 interface ICardPrivateService extends CardPrivateService {}
 
 export type TCardPublicService = {
@@ -30,6 +38,26 @@ export class CardPublicService implements TCardPublicService {
     {
       maxExec: 35,
       delay: 10,
+    }
+  );
+
+  public findByDetectionRange = execpool<
+    typeof CANCELED_PROMISE_SYMBOL | IHumanCardRow | null
+  >(
+    retry(
+      async (detectionId: string) => {
+        this.loggerService.logCtx("cardPublicService findByDetectionRange", {
+          detectionId,
+        });
+        return await this.cardPrivateService.findByDetectionRange(detectionId);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
+    {
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 

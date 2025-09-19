@@ -9,6 +9,10 @@ import { minio } from "../../../minio";
 import { TContextService } from "../base/ContextService";
 import RequestFactory from "../../common/RequestFactory";
 import { CC_FINDFACE_WATCHLIST } from "../../config/params";
+import dayjs from "dayjs";
+
+const HOURS_PASSED_REJECT = 24;
+const COMPARE_THRESHOLD = "0.72";
 
 export class CardPrivateService {
   protected readonly loggerService = inject<LoggerService>(TYPES.loggerService);
@@ -36,10 +40,54 @@ export class CardPrivateService {
           Authorization: `Token ${this.tokenService.getToken()}`,
         },
       },
-      this.contextService.context,
+      this.contextService.context
     );
     const { results } = await factory.fetchJson();
     const [output = null] = results;
+    return output
+      ? {
+          id: output.id,
+          name: output.name,
+          ...output.meta,
+          createdDate: output.created_date,
+          modifiedDate: output.modified_date,
+        }
+      : null;
+  };
+
+  public findByDetectionRange = async (
+    detectionId: string
+  ): Promise<IHumanCardRow | null> => {
+    this.loggerService.logCtx(`cardPrivateService findByDetectionRange`, {
+      detectionId,
+    });
+    const url = new URL(`${CC_FINDFACE_URL}/cards/humans/`);
+    url.searchParams.set("ordering", "-created_date");
+    url.searchParams.set("looks_like", `detection:${detectionId}`);
+    url.searchParams.set("limit", "5");
+    url.searchParams.set("watch_lists", String(CC_FINDFACE_WATCHLIST));
+    url.searchParams.set("threshold", COMPARE_THRESHOLD);
+    const factory = RequestFactory.makeRequest(
+      `cardPrivateService findByDetectionRange`,
+      url.toString(),
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Token ${this.tokenService.getToken()}`,
+        },
+      },
+      this.contextService.context
+    );
+    const { results } = await factory.fetchJson();
+    const now = dayjs();
+    const [output = null] = results
+      .filter(({ modified_date }) => {
+        const modifiedDate = dayjs(modified_date);
+        return now.diff(modifiedDate, "hour") < HOURS_PASSED_REJECT;
+      })
+      .sort(
+        ({ looks_like_confidence: a }, { looks_like_confidence: b }) => b - a
+      );
     return output
       ? {
           id: output.id,
@@ -66,7 +114,7 @@ export class CardPrivateService {
           Authorization: `Token ${this.tokenService.getToken()}`,
         },
       },
-      this.contextService.context,
+      this.contextService.context
     );
     const output = await factory.fetchJson();
     return output
@@ -93,9 +141,13 @@ export class CardPrivateService {
         headers: {
           Authorization: `Token ${this.tokenService.getToken()}`,
         },
-        body: JSON.stringify({ name, watch_lists: [CC_FINDFACE_WATCHLIST], meta }),
+        body: JSON.stringify({
+          name,
+          watch_lists: [CC_FINDFACE_WATCHLIST],
+          meta,
+        }),
       },
-      this.contextService.context,
+      this.contextService.context
     );
     const output = await factory.fetchJson();
     return {
@@ -124,9 +176,14 @@ export class CardPrivateService {
         headers: {
           Authorization: `Token ${this.tokenService.getToken()}`,
         },
-        body: JSON.stringify({ id, name, watch_lists: [CC_FINDFACE_WATCHLIST], meta }),
+        body: JSON.stringify({
+          id,
+          name,
+          watch_lists: [CC_FINDFACE_WATCHLIST],
+          meta,
+        }),
       },
-      this.contextService.context,
+      this.contextService.context
     );
     const output = await factory.fetchJson();
     return {
@@ -164,7 +221,7 @@ export class CardPrivateService {
         },
         body: formData,
       },
-      this.contextService.context,
+      this.contextService.context
     );
     const response = await factory.fetch();
     const { id: fileId, name: fileName } = <any>await response.json();
@@ -179,10 +236,13 @@ export class CardPrivateService {
     blob: Blob,
     fileName: string = "image.png"
   ): Promise<IAttachment> => {
-    this.loggerService.logCtx(`cardPrivateService addHumanCardAttachmentByBlob`, {
-      id,
-      fileName,
-    });
+    this.loggerService.logCtx(
+      `cardPrivateService addHumanCardAttachmentByBlob`,
+      {
+        id,
+        fileName,
+      }
+    );
     const formData = new FormData();
     formData.append("name", fileName);
     formData.append("file", blob, fileName);
@@ -197,7 +257,7 @@ export class CardPrivateService {
         },
         body: formData,
       },
-      this.contextService.context,
+      this.contextService.context
     );
     const response = await factory.fetch();
     const { id: fileId, name: returnedFileName } = <any>await response.json();

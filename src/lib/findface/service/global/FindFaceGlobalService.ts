@@ -43,6 +43,8 @@ import { IAttachment } from "../../model/Attachment.model";
 import IDetectVerify from "../../model/DetectVerify.model";
 import { ILicensePlaceDetect } from "../../model/LicensePlateDetect.model";
 
+const MAX_AUTH_ATTEMPTS = 3;
+
 interface TRequest<T extends object>
   extends Omit<
     IContext,
@@ -105,8 +107,14 @@ export class ListenerService
     }
   );
 
-  public detectFace = async (request: TRequest<{ imageId: string }>) => {
-    this.loggerService.log("findFaceGlobalService detectFace", { request });
+  public detectFace = async (
+    request: TRequest<{ imageId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService detectFace", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceDetect[]>> => {
         try {
@@ -129,12 +137,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService detectFace max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService detectFace 401", {
               request,
             });
             this.getToken.clear();
-            return await this.detectFace(request);
+            return await this.detectFace(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService detectFace error", {
             request,
@@ -165,8 +181,14 @@ export class ListenerService
     );
   };
 
-  public detectFaceByBlob = async (request: TRequest<{ blob: Blob }>) => {
-    this.loggerService.log("findFaceGlobalService detectFaceByBlob", { request });
+  public detectFaceByBlob = async (
+    request: TRequest<{ blob: Blob }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService detectFaceByBlob", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceDetect[]>> => {
         try {
@@ -189,12 +211,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService detectFaceByBlob max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService detectFaceByBlob 401", {
               request,
             });
             this.getToken.clear();
-            return await this.detectFaceByBlob(request);
+            return await this.detectFaceByBlob(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService detectFaceByBlob error", {
             request,
@@ -226,9 +256,13 @@ export class ListenerService
   };
 
   public verifyFace = async (
-    request: TRequest<{ cardId: string; detectionId: string }>
+    request: TRequest<{ cardId: string; detectionId: string }>,
+    attempt = 0
   ) => {
-    this.loggerService.log("findFaceGlobalService verifyFace", { request });
+    this.loggerService.log("findFaceGlobalService verifyFace", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceVerify | null>> => {
         try {
@@ -252,12 +286,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService verifyFace max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService verifyFace 401", {
               request,
             });
             this.getToken.clear();
-            return await this.verifyFace(request);
+            return await this.verifyFace(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService verifyFace error", {
             request,
@@ -289,9 +331,13 @@ export class ListenerService
   };
 
   public verifyDetect = async (
-    request: TRequest<{ detectionId2: string; detectionId1: string }>
+    request: TRequest<{ detectionId2: string; detectionId1: string }>,
+    attempt = 0
   ) => {
-    this.loggerService.log("findFaceGlobalService verifyDetect", { request });
+    this.loggerService.log("findFaceGlobalService verifyDetect", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IDetectVerify | null>> => {
         try {
@@ -315,12 +361,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService verifyDetect max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService verifyDetect 401", {
               request,
             });
             this.getToken.clear();
-            return await this.verifyDetect(request);
+            return await this.verifyDetect(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService verifyDetect error", {
             request,
@@ -351,8 +405,14 @@ export class ListenerService
     );
   };
 
-  public eventFace = async (request: TRequest<{ imageId: string }>) => {
-    this.loggerService.log("findFaceGlobalService eventFace", { request });
+  public eventFace = async (
+    request: TRequest<{ imageId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService eventFace", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceEvent>> => {
         try {
@@ -375,12 +435,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService eventFace max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService eventFace 401", {
               request,
             });
             this.getToken.clear();
-            return await this.eventFace(request);
+            return await this.eventFace(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService eventFace error", {
             request,
@@ -411,8 +479,14 @@ export class ListenerService
     );
   };
 
-  public eventFaceByBlob = async (request: TRequest<{ blob: Blob }>) => {
-    this.loggerService.log("findFaceGlobalService eventFaceByBlob", { request });
+  public eventFaceByBlob = async (
+    request: TRequest<{ blob: Blob }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService eventFaceByBlob", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceEvent>> => {
         try {
@@ -435,12 +509,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService eventFaceByBlob max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService eventFaceByBlob 401", {
               request,
             });
             this.getToken.clear();
-            return await this.eventFaceByBlob(request);
+            return await this.eventFaceByBlob(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService eventFaceByBlob error", {
             request,
@@ -471,8 +553,14 @@ export class ListenerService
     );
   };
 
-  public eventFaceByCardId = async (request: TRequest<{ cardId: string }>) => {
-    this.loggerService.log("findFaceGlobalService eventFaceByCardId", { request });
+  public eventFaceByCardId = async (
+    request: TRequest<{ cardId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService eventFaceByCardId", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFaceEvent>> => {
         try {
@@ -495,12 +583,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService eventFaceByCardId max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService eventFaceByCardId 401", {
               request,
             });
             this.getToken.clear();
-            return await this.eventFaceByCardId(request);
+            return await this.eventFaceByCardId(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService eventFaceByCardId error", {
             request,
@@ -532,9 +628,13 @@ export class ListenerService
   };
 
   public createFace = async (
-    request: TRequest<{ cardId: string; imageId: string }>
+    request: TRequest<{ cardId: string; imageId: string }>,
+    attempt = 0
   ) => {
-    this.loggerService.log("findFaceGlobalService createFace", { request });
+    this.loggerService.log("findFaceGlobalService createFace", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFace>> => {
         try {
@@ -558,12 +658,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService createFace max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService createFace 401", {
               request,
             });
             this.getToken.clear();
-            return await this.createFace(request);
+            return await this.createFace(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService createFace error", {
             request,
@@ -595,9 +703,13 @@ export class ListenerService
   };
 
   public createFaceByBlob = async (
-    request: TRequest<{ cardId: string; blob: Blob }>
+    request: TRequest<{ cardId: string; blob: Blob }>,
+    attempt = 0
   ) => {
-    this.loggerService.log("findFaceGlobalService createFaceByBlob", { request });
+    this.loggerService.log("findFaceGlobalService createFaceByBlob", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFace>> => {
         try {
@@ -621,12 +733,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService createFaceByBlob max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService createFaceByBlob 401", {
               request,
             });
             this.getToken.clear();
-            return await this.createFaceByBlob(request);
+            return await this.createFaceByBlob(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService createFaceByBlob error", {
             request,
@@ -657,8 +777,14 @@ export class ListenerService
     );
   };
 
-  public listFace = async (request: TRequest<{ cardId: string }>) => {
-    this.loggerService.log("findFaceGlobalService listFace", { request });
+  public listFace = async (
+    request: TRequest<{ cardId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService listFace", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IFace[]>> => {
         try {
@@ -681,10 +807,18 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService listFace max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService listFace 401", { request });
             this.getToken.clear();
-            return await this.listFace(request);
+            return await this.listFace(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService listFace error", {
             request,
@@ -715,8 +849,14 @@ export class ListenerService
     );
   };
 
-  public removeFace = async (request: TRequest<{ faceId: string }>) => {
-    this.loggerService.log("findFaceGlobalService removeFace", { request });
+  public removeFace = async (
+    request: TRequest<{ faceId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService removeFace", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<null>> => {
         try {
@@ -739,12 +879,20 @@ export class ListenerService
             data: null,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService removeFace max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService removeFace 401", {
               request,
             });
             this.getToken.clear();
-            return await this.removeFace(request);
+            return await this.removeFace(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService removeFace error", {
             request,
@@ -776,9 +924,13 @@ export class ListenerService
   };
 
   public findByDetection = async (
-    request: TRequest<{ detectionId: string }>
+    request: TRequest<{ detectionId: string }>,
+    attempt = 0
   ) => {
-    this.loggerService.log("findFaceGlobalService findByDetection", { request });
+    this.loggerService.log("findFaceGlobalService findByDetection", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow | null>> => {
         try {
@@ -801,12 +953,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService findByDetection max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService findByDetection 401", {
               request,
             });
             this.getToken.clear();
-            return await this.findByDetection(request);
+            return await this.findByDetection(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService findByDetection error", {
             request,
@@ -837,8 +997,88 @@ export class ListenerService
     );
   };
 
-  public findByCardId = async (request: TRequest<{ cardId: string }>) => {
-    this.loggerService.log("findFaceGlobalService findByCardId", { request });
+  public findByDetectionRange = async (
+    request: TRequest<{ detectionId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService findByDetectionRange", {
+      request,
+      attempt,
+    });
+    return await ContextService.runInContext(
+      async (): Promise<TResponse<IHumanCardRow | null>> => {
+        try {
+          const data = await this.cardPublicService.findByDetectionRange(
+            request.data.detectionId
+          );
+          if (data === CANCELED_PROMISE_SYMBOL) {
+            throw new Error("request canceled");
+          }
+          this.loggerService.log("findFaceGlobalService findByDetectionRange ok", {
+            request,
+            data,
+          });
+          return {
+            status: "ok",
+            serviceName: request.serviceName,
+            clientId: request.clientId,
+            userId: request.userId,
+            requestId: request.requestId,
+            data,
+          };
+        } catch (error: any) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService findByDetectionRange max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
+            this.loggerService.log("findFaceGlobalService findByDetectionRange 401", {
+              request,
+            });
+            this.getToken.clear();
+            return await this.findByDetectionRange(request, attempt + 1); // Corrected recursion
+          }
+          this.loggerService.log("findFaceGlobalService findByDetectionRange error", {
+            request,
+            error: errorData(error),
+          });
+          return {
+            status: "error",
+            error: getErrorMessage(error),
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          };
+        }
+      },
+      {
+        clientId: request.clientId,
+        serviceName: request.serviceName,
+        requestId: request.requestId,
+        userId: request.userId,
+        token: await this.getToken({
+          clientId: request.clientId,
+          serviceName: request.serviceName,
+          requestId: request.requestId,
+          userId: request.userId,
+        }),
+      }
+    );
+  };
+
+  public findByCardId = async (
+    request: TRequest<{ cardId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService findByCardId", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow | null>> => {
         try {
@@ -861,12 +1101,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService findByCardId max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService findByCardId 401", {
               request,
             });
             this.getToken.clear();
-            return await this.findByCardId(request);
+            return await this.findByCardId(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService findByCardId error", {
             request,
@@ -897,8 +1145,14 @@ export class ListenerService
     );
   };
 
-  public createHumanCard = async (request: TRequest<IHumanCardDto>) => {
-    this.loggerService.log("findFaceGlobalService createHumanCard", { request });
+  public createHumanCard = async (
+    request: TRequest<IHumanCardDto>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService createHumanCard", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow>> => {
         try {
@@ -921,12 +1175,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService createHumanCard max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService createHumanCard 401", {
               request,
             });
             this.getToken.clear();
-            return await this.createHumanCard(request);
+            return await this.createHumanCard(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService createHumanCard error", {
             request,
@@ -958,9 +1220,13 @@ export class ListenerService
   };
 
   public updateHumanCard = async (
-    request: TRequest<{ id: number; dto: IHumanCardDto }>
+    request: TRequest<{ id: number; dto: IHumanCardDto }>,
+    attempt = 0
   ) => {
-    this.loggerService.log("findFaceGlobalService updateHumanCard", { request });
+    this.loggerService.log("findFaceGlobalService updateHumanCard", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IHumanCardRow>> => {
         try {
@@ -984,12 +1250,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService updateHumanCard max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService updateHumanCard 401", {
               request,
             });
             this.getToken.clear();
-            return await this.updateHumanCard(request);
+            return await this.updateHumanCard(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService updateHumanCard error", {
             request,
@@ -1021,10 +1295,12 @@ export class ListenerService
   };
 
   public addHumanCardAttachment = async (
-    request: TRequest<{ id: number; imageId: string }>
+    request: TRequest<{ id: number; imageId: string }>,
+    attempt = 0
   ) => {
     this.loggerService.log("findFaceGlobalService addHumanCardAttachment", {
       request,
+      attempt,
     });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IAttachment>> => {
@@ -1049,13 +1325,21 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService addHumanCardAttachment max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log(
               "findFaceGlobalService addHumanCardAttachment 401",
               { request }
             );
             this.getToken.clear();
-            return await this.addHumanCardAttachment(request);
+            return await this.addHumanCardAttachment(request, attempt + 1);
           }
           this.loggerService.log(
             "findFaceGlobalService addHumanCardAttachment error",
@@ -1087,10 +1371,12 @@ export class ListenerService
   };
 
   public addHumanCardAttachmentByBlob = async (
-    request: TRequest<{ id: number; blob: Blob; fileName?: string }>
+    request: TRequest<{ id: number; blob: Blob; fileName?: string }>,
+    attempt = 0
   ) => {
     this.loggerService.log("findFaceGlobalService addHumanCardAttachmentByBlob", {
       request,
+      attempt,
     });
     return await ContextService.runInContext(
       async (): Promise<TResponse<IAttachment>> => {
@@ -1116,13 +1402,21 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService addHumanCardAttachmentByBlob max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log(
               "findFaceGlobalService addHumanCardAttachmentByBlob 401",
               { request }
             );
             this.getToken.clear();
-            return await this.addHumanCardAttachmentByBlob(request);
+            return await this.addHumanCardAttachmentByBlob(request, attempt + 1);
           }
           this.loggerService.log(
             "findFaceGlobalService addHumanCardAttachmentByBlob error",
@@ -1153,8 +1447,14 @@ export class ListenerService
     );
   };
 
-  public detectLicensePlate = async (request: TRequest<{ imageId: string }>) => {
-    this.loggerService.log("findFaceGlobalService detectLicensePlate", { request });
+  public detectLicensePlate = async (
+    request: TRequest<{ imageId: string }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService detectLicensePlate", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<ILicensePlaceDetect[]>> => {
         try {
@@ -1177,12 +1477,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService detectLicensePlate max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService detectLicensePlate 401", {
               request,
             });
             this.getToken.clear();
-            return await this.detectLicensePlate(request);
+            return await this.detectLicensePlate(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService detectLicensePlate error", {
             request,
@@ -1213,8 +1521,14 @@ export class ListenerService
     );
   };
 
-  public detectLicensePlateByBlob = async (request: TRequest<{ imageFile: Blob }>) => {
-    this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob", { request });
+  public detectLicensePlateByBlob = async (
+    request: TRequest<{ imageFile: Blob }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<ILicensePlaceDetect[]>> => {
         try {
@@ -1237,12 +1551,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService detectLicensePlateByBlob max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob 401", {
               request,
             });
             this.getToken.clear();
-            return await this.detectLicensePlateByBlob(request);
+            return await this.detectLicensePlateByBlob(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService detectLicensePlateByBlob error", {
             request,
@@ -1273,8 +1595,14 @@ export class ListenerService
     );
   };
 
-  public captureScreenshot = async (request: TRequest<{ cameraId: number }>) => {
-    this.loggerService.log("findFaceGlobalService captureScreenshot", { request });
+  public captureScreenshot = async (
+    request: TRequest<{ cameraId: number }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService captureScreenshot", {
+      request,
+      attempt,
+    });
     return await ContextService.runInContext(
       async (): Promise<TResponse<Blob>> => {
         try {
@@ -1297,12 +1625,20 @@ export class ListenerService
             data,
           };
         } catch (error: any) {
-          if (error?.statusCode === 401 || error?.statusCode === 403) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService captureScreenshot max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
             this.loggerService.log("findFaceGlobalService captureScreenshot 401", {
               request,
             });
             this.getToken.clear();
-            return await this.captureScreenshot(request);
+            return await this.captureScreenshot(request, attempt + 1);
           }
           this.loggerService.log("findFaceGlobalService captureScreenshot error", {
             request,
