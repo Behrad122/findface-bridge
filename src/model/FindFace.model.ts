@@ -140,6 +140,18 @@ export interface FindByDetectionData {
   detectionId: string;
 }
 
+export interface FindByDetectionRangeRequest {
+  serviceName: string;
+  clientId: string;
+  userId: string;
+  requestId: string;
+  data: FindByDetectionRangeData;
+}
+
+export interface FindByDetectionRangeData {
+  detectionId: string;
+}
+
 export interface FindByCardIdRequest {
   serviceName: string;
   clientId: string;

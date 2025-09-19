@@ -14,6 +14,7 @@ import {
   EventFaceRequest,
   FindByCardIdRequest,
   FindByDetectionRequest,
+  FindByDetectionRangeRequest,
   ListFaceRequest,
   RemoveFaceRequest,
   UpdateHumanCardRequest,
@@ -432,6 +433,38 @@ app.post("/api/v1/findface/findByDetection", async (ctx) => {
     );
   } finally {
     console.timeEnd(`/api/v1/findface/findByDetection ${request.requestId}`);
+  }
+});
+
+app.post("/api/v1/findface/findByDetectionRange", async (ctx) => {
+  const request = await ctx.req.json<FindByDetectionRangeRequest>();
+  console.time(`/api/v1/findface/findByDetectionRange ${request.requestId}`);
+  logger.log("/api/v1/findface/findByDetectionRange", { request });
+  try {
+    const result = await findface.findFaceGlobalService.findByDetectionRange(request);
+    logger.log("/api/v1/findface/findByDetectionRange ok", { request, result });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    return ctx.json(result, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/findByDetectionRange error", {
+      request,
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/findface/findByDetectionRange ${request.requestId}`);
   }
 });
 
