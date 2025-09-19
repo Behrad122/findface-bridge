@@ -51,7 +51,6 @@
     "jsonwebtoken": "9.0.2",
     "lodash-es": "4.17.21",
     "minio": "8.0.2",
-    "mongoose": "8.9.3",
     "node-fetch": "2.0.0",
     "pinolog": "1.0.2",
     "pocketbase": "0.26.2",
