@@ -9,6 +9,6 @@ export const CC_FINDFACE_PASSWORD = process.env.CC_FINDFACE_PASSWORD || "node900
 
 export const CC_FINDFACE_EVENT_TOKEN = process.env.CC_FINDFACE_EVENT_TOKEN || "15ca64cd61e14022b7c6eecc8cfc4b63";
 export const CC_FINDFACE_EVENT_CAMERA = process.env.CC_FINDFACE_EVENT_CAMERA || "2";
-export const CC_FINDFACE_WATCHLIST = parseInt(process.env.CC_FINDFACE_WATCHLIST) || 2;
+export const CC_FINDFACE_WATCHLIST = parseInt(process.env.CC_FINDFACE_WATCHLIST) || 0;
 
 export const CC_ENABLE_TERMINATE_SESSIONS = !!process.env.CC_ENABLE_TERMINATE_SESSIONS || false;

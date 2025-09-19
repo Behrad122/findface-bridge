@@ -29,7 +29,9 @@ export class CardPrivateService {
     });
     const url = new URL(`${CC_FINDFACE_URL}/cards/humans/`);
     url.searchParams.set("looks_like", `detection:${detectionId}`);
-    url.searchParams.set("watch_lists", String(CC_FINDFACE_WATCHLIST));
+    if (CC_FINDFACE_WATCHLIST) {
+      url.searchParams.set("watch_lists", String(CC_FINDFACE_WATCHLIST));
+    }
     url.searchParams.set("limit", "1");
     const factory = RequestFactory.makeRequest(
       `cardPrivateService findByDetection`,
@@ -65,7 +67,9 @@ export class CardPrivateService {
     url.searchParams.set("ordering", "-created_date");
     url.searchParams.set("looks_like", `detection:${detectionId}`);
     url.searchParams.set("limit", "5");
-    url.searchParams.set("watch_lists", String(CC_FINDFACE_WATCHLIST));
+    if (CC_FINDFACE_WATCHLIST) {
+      url.searchParams.set("watch_lists", String(CC_FINDFACE_WATCHLIST));
+    }
     url.searchParams.set("threshold", COMPARE_THRESHOLD);
     const factory = RequestFactory.makeRequest(
       `cardPrivateService findByDetectionRange`,
@@ -143,7 +147,7 @@ export class CardPrivateService {
         },
         body: JSON.stringify({
           name,
-          watch_lists: [CC_FINDFACE_WATCHLIST],
+          watch_lists: CC_FINDFACE_WATCHLIST ? [CC_FINDFACE_WATCHLIST] : undefined,
           meta,
         }),
       },
@@ -179,7 +183,7 @@ export class CardPrivateService {
         body: JSON.stringify({
           id,
           name,
-          watch_lists: [CC_FINDFACE_WATCHLIST],
+          watch_lists: CC_FINDFACE_WATCHLIST ? [CC_FINDFACE_WATCHLIST] : undefined,
           meta,
         }),
       },
