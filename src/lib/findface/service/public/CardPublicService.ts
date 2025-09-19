@@ -29,15 +29,20 @@ export class CardPublicService implements TCardPublicService {
   public findByDetection = execpool<
     typeof CANCELED_PROMISE_SYMBOL | IHumanCardRow | null
   >(
-    retry(async (detectionId: string) => {
-      this.loggerService.logCtx("cardPublicService findByDetection", {
-        detectionId,
-      });
-      return await this.cardPrivateService.findByDetection(detectionId);
-    }),
+    retry(
+      async (detectionId: string) => {
+        this.loggerService.logCtx("cardPublicService findByDetection", {
+          detectionId,
+        });
+        return await this.cardPrivateService.findByDetection(detectionId);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
     {
-      maxExec: 35,
-      delay: 10,
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 
@@ -62,67 +67,92 @@ export class CardPublicService implements TCardPublicService {
   );
 
   public findByCardId = execpool(
-    retry(async (cardId: string) => {
-      this.loggerService.logCtx("cardPublicService findByCardId", {
-        cardId,
-      });
-      return await this.cardPrivateService.findByCardId(cardId);
-    }),
+    retry(
+      async (cardId: string) => {
+        this.loggerService.logCtx("cardPublicService findByCardId", {
+          cardId,
+        });
+        return await this.cardPrivateService.findByCardId(cardId);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
     {
-      maxExec: 35,
-      delay: 10,
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 
   public createHumanCard = execpool(
-    retry(async (dto: IHumanCardDto) => {
-      this.loggerService.logCtx("cardPublicService createHumanCard", { dto });
-      return await this.cardPrivateService.createHumanCard(dto);
-    }),
+    retry(
+      async (dto: IHumanCardDto) => {
+        this.loggerService.logCtx("cardPublicService createHumanCard", { dto });
+        return await this.cardPrivateService.createHumanCard(dto);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
     {
-      maxExec: 35,
-      delay: 10,
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 
   public updateHumanCard = execpool(
-    retry(async (id: number, dto: IHumanCardDto) => {
-      this.loggerService.logCtx("cardPublicService updateHumanCard", {
-        id,
-        dto,
-      });
-      return await this.cardPrivateService.updateHumanCard(id, dto);
-    }),
+    retry(
+      async (id: number, dto: IHumanCardDto) => {
+        this.loggerService.logCtx("cardPublicService updateHumanCard", {
+          id,
+          dto,
+        });
+        return await this.cardPrivateService.updateHumanCard(id, dto);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
     {
-      maxExec: 35,
-      delay: 10,
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 
   public addHumanCardAttachment = execpool(
-    retry(async (id: number, imageId: string) => {
-      this.loggerService.logCtx("cardPublicService addHumanCardAttachment", {
-        id,
-      });
-      return await this.cardPrivateService.addHumanCardAttachment(id, imageId);
-    }),
+    retry(
+      async (id: number, imageId: string) => {
+        this.loggerService.logCtx("cardPublicService addHumanCardAttachment", {
+          id,
+        });
+        return await this.cardPrivateService.addHumanCardAttachment(id, imageId);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
     {
-      maxExec: 35,
-      delay: 10,
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 
   public addHumanCardAttachmentByBlob = execpool(
-    retry(async (id: number, blob: Blob, fileName: string = "image.png") => {
-      this.loggerService.logCtx("cardPublicService addHumanCardAttachmentByBlob", {
-        id,
-        fileName,
-      });
-      return await this.cardPrivateService.addHumanCardAttachmentByBlob(id, blob, fileName);
-    }),
+    retry(
+      async (id: number, blob: Blob, fileName: string = "image.png") => {
+        this.loggerService.logCtx("cardPublicService addHumanCardAttachmentByBlob", {
+          id,
+          fileName,
+        });
+        return await this.cardPrivateService.addHumanCardAttachmentByBlob(id, blob, fileName);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
     {
-      maxExec: 35,
-      delay: 10,
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
     }
   );
 }
