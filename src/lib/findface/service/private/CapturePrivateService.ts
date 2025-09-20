@@ -5,18 +5,9 @@ import TYPES from "../../config/types";
 import { CC_FINDFACE_URL } from "../../config/params";
 import { TContextService } from "../base/ContextService";
 import RequestFactory from "../../common/RequestFactory";
-import { sleep, ttl } from "functools-kit";
-
-// Инициализируем WebCodecs polyfill для Node.js
-import { } from "@remotion/webcodecs"
-
-import {
-  Output,
-  BufferTarget,
-  WebMOutputFormat,
-  VideoSampleSource,
-  VideoSample,
-} from "mediabunny";
+import { createAwaiter, sleep, ttl } from "functools-kit";
+import ffmpeg from "fluent-ffmpeg";
+import { Readable, PassThrough, Writable } from "stream";
 
 const CAPTURE_WIDTH = 0;
 const CAPTURE_DELAY = 1_000;
@@ -62,53 +53,89 @@ export class CapturePrivateService {
     }
   );
 
-  public captureVideo = async (cameraId: number): Promise<Blob> => {
-    this.loggerService.logCtx(`capturePrivateService captureVideo`, {
-      cameraId,
-    });
-
-    // Получаем первый снимок чтобы узнать размеры
-    const imageBlob = await this.captureScreenshot(cameraId);
-    const imageBuffer = await imageBlob.arrayBuffer();
-
-    const videoSource = new VideoSampleSource({
-      codec: "vp9",
-      bitrate: VIDEO_BITRATE,
-    });
-
-    const output = new Output({
-      format: new WebMOutputFormat(),
-      target: new BufferTarget(),
-    });
-
-    output.addVideoTrack(videoSource);
-
-    // Генерируем кадры в цикле (как в твоем примере)
-    const totalFrames = VIDEO_FRAME_RATE * VIDEO_DURATION_SECONDS;
-    for (let i = 0; i < totalFrames; i++) {
-      const timestamp = i / VIDEO_FRAME_RATE; // в секундах
-      const duration = 1 / VIDEO_FRAME_RATE; // длительность кадра
-
-      // Создаем VideoSample из буфера изображения
-      const videoSample = new VideoSample(new Uint8Array(imageBuffer), {
-        format: 'RGBA',
-        codedWidth: 640, // TODO: определить реальные размеры из imageBuffer
-        codedHeight: 480,
-        timestamp: timestamp,
-        duration: duration,
+  public captureVideo = ttl(
+    async (cameraId: number): Promise<Blob> => {
+      this.loggerService.logCtx(`capturePrivateService captureVideo`, {
+        cameraId,
       });
 
-      await videoSource.add(videoSample);
-      await sleep(1000 / VIDEO_FRAME_RATE);
-      videoSample.close();
+      const totalFrames = VIDEO_FRAME_RATE * VIDEO_DURATION_SECONDS;
+
+      const inputStream = new Readable({
+        read() {},
+      });
+
+      const [result, { resolve, reject }] = createAwaiter<Blob>();
+
+      let ffmpegProcess: PassThrough | Writable;
+
+      {
+        const outputStream = new PassThrough();
+        const outputBuffers: Buffer[] = [];
+
+        outputStream.on("data", (chunk) => outputBuffers.push(chunk));
+        outputStream.on("end", () => {
+          const videoBuffer = Buffer.concat(outputBuffers);
+          const videoBlob = new Blob([videoBuffer], { type: "video/webm" });
+          resolve(videoBlob);
+        });
+        outputStream.on("error", (err) => {
+          console.log(`Output stream error: ${err.message} cameraId=${cameraId}`);
+          ffmpegProcess.destroy();
+          reject(err);
+        });
+
+        ffmpegProcess = ffmpeg()
+          .input(inputStream)
+          .inputFormat("image2pipe")
+          .inputOptions(["-framerate", String(VIDEO_FRAME_RATE)])
+          .outputOptions([
+            "-c:v",
+            "libvpx-vp9",
+            "-b:v",
+            String(VIDEO_BITRATE),
+            "-pix_fmt",
+            "yuv420p",
+            "-r",
+            String(VIDEO_FRAME_RATE),
+            "-t",
+            String(VIDEO_DURATION_SECONDS),
+          ])
+          .outputFormat("webm")
+          .on("end", () => {
+            ffmpegProcess.destroy(); // Завершаем процесс после успешного завершения
+          })
+          .on("error", (err) => {
+            console.log(`FFmpeg error: ${err.message} cameraId=${cameraId}`);
+            ffmpegProcess.destroy(); // Завершаем процесс при ошибке FFmpeg
+            reject(err);
+          })
+          .pipe(outputStream);
+      }
+
+      try {
+        for (let i = 0; i < totalFrames; i++) {
+          const imageBlob = await this.captureScreenshot(cameraId);
+          const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
+          console.log(`Frame ${i} size: ${imageBuffer.length} cameraId=${cameraId}`);
+          inputStream.push(imageBuffer);
+          await sleep(CAPTURE_DELAY);
+        }
+        inputStream.push(null);
+      } catch (err) {
+        console.log(`Error in frame loop: ${err.message} cameraId=${cameraId}`);
+        inputStream.destroy(err);
+        ffmpegProcess.destroy();
+        reject(err);
+      }
+
+      return await result;
+    },
+    {
+      key: ([cameraId]) => `${cameraId}`,
+      timeout: CAPTURE_DELAY * VIDEO_FRAME_RATE,
     }
-
-    await output.finalize();
-    const videoBuffer = output.target.buffer;
-    const videoBlob = new Blob([videoBuffer], { type: "video/webm" });
-
-    return videoBlob;
-  };
+  );
 }
 
 export default CapturePrivateService;

@@ -280,6 +280,36 @@ docker run -d \
 }
 ```
 
+### 3.1. Создание видео с камеры
+
+**POST** `/api/v1/findface/captureVideo`
+
+Создает короткое видео (1 сек) с указанной камеры в формате WebM. Видео состоит из 15 кадров снимков с камеры (15 FPS), обернутых в WebM контейнер для batch передачи данных.
+
+**Запрос:**
+```json
+{
+  "serviceName": "string",
+  "clientId": "string",
+  "userId": "string",
+  "requestId": "string",
+  "data": {
+    "cameraId": 1
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "status": "ok",
+  "data": {
+    "videoBase64": "string",
+    "contentType": "video/webm"
+  }
+}
+```
+
 ### 4. Верификация лица
 
 **POST** `/api/v1/findface/verifyFace`
@@ -636,6 +666,28 @@ docker run -d \
 }
 ```
 
+## Simplified REST Endpoints
+
+Упрощенные эндпоинты для быстрого доступа к основным функциям без JSON обертки:
+
+### GET `/api/v1/screenshot/:cameraId`
+
+Получает снимок с указанной камеры. Возвращает изображение напрямую без JSON обертки.
+
+**Пример:**
+```bash
+curl http://localhost:20050/api/v1/screenshot/1 > screenshot.jpg
+```
+
+### GET `/api/v1/video/:cameraId`
+
+Получает короткое видео (1 сек) с указанной камеры в формате WebM. Видео состоит из 15 кадров снимков с камеры (15 FPS), обернутых в WebM контейнер для batch передачи данных. Возвращает видеофайл напрямую без JSON обертки.
+
+**Пример:**
+```bash
+curl http://localhost:20050/api/v1/video/1 > video.webm
+```
+
 ## Debug Minio-endpoints
 
 Для отладки доступны специальные endpoints, которые сохраняют изображения в MinIO лог:
@@ -681,6 +733,34 @@ curl -X POST http://localhost:20050/api/v1/findface/captureScreenshot \
       "cameraId": 1
     }
   }'
+```
+
+### Создание видео с камеры
+
+```bash
+curl -X POST http://localhost:20050/api/v1/findface/captureVideo \
+  -H "Content-Type: application/json" \
+  -d '{
+    "serviceName": "my-service",
+    "clientId": "client-123",
+    "userId": "user-456",
+    "requestId": "req-791",
+    "data": {
+      "cameraId": 1
+    }
+  }'
+```
+
+### Упрощенное получение снимка
+
+```bash
+curl http://localhost:20050/api/v1/screenshot/1 > screenshot.jpg
+```
+
+### Упрощенное получение видео
+
+```bash
+curl http://localhost:20050/api/v1/video/1 > video.webm
 ```
 
 ## Коды ошибок
