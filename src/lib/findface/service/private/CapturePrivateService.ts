@@ -5,7 +5,7 @@ import TYPES from "../../config/types";
 import { CC_FINDFACE_URL } from "../../config/params";
 import { TContextService } from "../base/ContextService";
 import RequestFactory from "../../common/RequestFactory";
-import { createAwaiter, sleep, ttl } from "functools-kit";
+import { createAwaiter, sleep, timeout, ttl } from "functools-kit";
 import ffmpeg from "fluent-ffmpeg";
 import { Readable, PassThrough, Writable } from "stream";
 
@@ -15,6 +15,9 @@ const CAPTURE_DELAY = 1_000;
 const VIDEO_FRAME_RATE = 15;
 const VIDEO_DURATION_SECONDS = 1;
 const VIDEO_BITRATE = 1_000_000;
+
+const VIDEO_DELAY = CAPTURE_DELAY * VIDEO_FRAME_RATE + CAPTURE_DELAY;
+const VIDEO_TIMEOUT = 2 * VIDEO_DELAY;
 
 export class CapturePrivateService {
   protected readonly loggerService = inject<LoggerService>(TYPES.loggerService);
@@ -54,7 +57,7 @@ export class CapturePrivateService {
   );
 
   public captureVideo = ttl(
-    async (cameraId: number): Promise<Blob> => {
+    timeout(async (cameraId: number): Promise<Blob> => {
       this.loggerService.logCtx(`capturePrivateService captureVideo`, {
         cameraId,
       });
@@ -80,7 +83,9 @@ export class CapturePrivateService {
           resolve(videoBlob);
         });
         outputStream.on("error", (err) => {
-          console.log(`Output stream error: ${err.message} cameraId=${cameraId}`);
+          console.log(
+            `Output stream error: ${err.message} cameraId=${cameraId}`
+          );
           ffmpegProcess.destroy();
           reject(err);
         });
@@ -117,23 +122,26 @@ export class CapturePrivateService {
         for (let i = 0; i < totalFrames; i++) {
           const imageBlob = await this.captureScreenshot(cameraId);
           const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
-          console.log(`Frame ${i} size: ${imageBuffer.length} cameraId=${cameraId}`);
+          console.log(
+            `Frame ${i} size: ${imageBuffer.length} cameraId=${cameraId}`
+          );
           inputStream.push(imageBuffer);
           await sleep(CAPTURE_DELAY);
         }
         inputStream.push(null);
       } catch (err) {
         console.log(`Error in frame loop: ${err.message} cameraId=${cameraId}`);
+        this.captureScreenshot.clear(`${cameraId}`);
         inputStream.destroy(err);
         ffmpegProcess.destroy();
         reject(err);
       }
 
       return await result;
-    },
+    }, VIDEO_TIMEOUT),
     {
       key: ([cameraId]) => `${cameraId}`,
-      timeout: CAPTURE_DELAY * VIDEO_FRAME_RATE,
+      timeout: VIDEO_DELAY,
     }
   );
 }

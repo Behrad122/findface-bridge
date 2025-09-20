@@ -2,7 +2,12 @@ import { inject } from "../../core/di";
 import CapturePrivateService from "../private/CapturePrivateService";
 import LoggerService from "../base/LoggerService";
 import TYPES from "../../config/types";
-import { CANCELED_PROMISE_SYMBOL, execpool, retry } from "functools-kit";
+import {
+  CANCELED_PROMISE_SYMBOL,
+  execpool,
+  retry,
+  TIMEOUT_SYMBOL,
+} from "functools-kit";
 
 const RETRY_COUNT = 5;
 const RETRY_DELAY = 1_000;
@@ -47,14 +52,24 @@ export class CapturePublicService implements TCapturePublicService {
       delay: EXEC_DELAY,
     }
   );
-
   public captureVideo = execpool<Blob | typeof CANCELED_PROMISE_SYMBOL>(
     retry(
       async (cameraId: number) => {
         this.loggerService.logCtx("capturePublicService captureVideo", {
           cameraId,
         });
-        return await this.capturePrivateService.captureVideo(cameraId);
+        try {
+          const result = await this.capturePrivateService.captureVideo(
+            cameraId
+          );
+          if (result === TIMEOUT_SYMBOL) {
+            throw new Error(`capture timeout for cameraId=${cameraId}`);
+          }
+          return result as Blob;
+        } catch (error) {
+          this.capturePrivateService.captureVideo.clear(`${cameraId}`);
+          throw error;
+        }
       },
       RETRY_COUNT,
       RETRY_DELAY,
