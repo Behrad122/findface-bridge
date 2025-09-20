@@ -830,3 +830,43 @@ app.post("/api/v1/findface/captureScreenshot", async (ctx) => {
     console.timeEnd(`/api/v1/findface/captureScreenshot ${request.requestId}`);
   }
 });
+
+app.post("/api/v1/findface/captureVideo", async (ctx) => {
+  const request = await ctx.req.json<CaptureScreenshotRequest>();
+  console.time(`/api/v1/findface/captureVideo ${request.requestId}`);
+  logger.log("/api/v1/findface/captureVideo", { request });
+  try {
+    const result = await findface.findFaceGlobalService.captureVideo(request);
+    logger.log("/api/v1/findface/captureVideo ok", { request, result });
+    if ("error" in result) {
+      throw new Error(result.error);
+    }
+    const videoBuffer = await result.data.arrayBuffer();
+    const videoBase64 = Buffer.from(videoBuffer).toString('base64');
+    return ctx.json({
+      ...result,
+      data: {
+        videoBase64,
+        contentType: result.data.type || 'video/webm'
+      }
+    }, 200);
+  } catch (error) {
+    logger.log("/api/v1/findface/captureVideo error", {
+      request,
+      error: errorData(error),
+    });
+    return ctx.json(
+      {
+        status: "error",
+        error: getErrorMessage(error),
+        clientId: request.clientId,
+        requestId: request.requestId,
+        serviceName: request.serviceName,
+        userId: request.userId,
+      },
+      500
+    );
+  } finally {
+    console.timeEnd(`/api/v1/findface/captureVideo ${request.requestId}`);
+  }
+});

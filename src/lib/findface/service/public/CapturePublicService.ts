@@ -47,6 +47,24 @@ export class CapturePublicService implements TCapturePublicService {
       delay: EXEC_DELAY,
     }
   );
+
+  public captureVideo = execpool<Blob | typeof CANCELED_PROMISE_SYMBOL>(
+    retry(
+      async (cameraId: number) => {
+        this.loggerService.logCtx("capturePublicService captureVideo", {
+          cameraId,
+        });
+        return await this.capturePrivateService.captureVideo(cameraId);
+      },
+      RETRY_COUNT,
+      RETRY_DELAY,
+      RETRY_CONDITION
+    ),
+    {
+      maxExec: MAX_EXEC,
+      delay: EXEC_DELAY,
+    }
+  );
 }
 
 export default CapturePublicService;

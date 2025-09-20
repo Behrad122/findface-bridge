@@ -7,6 +7,7 @@ import { createServer } from "http";
 
 import "../routes/findface";
 import "../routes/health";
+import "../routes/capture";
 
 const MAX_CONNECTIONS = 1_000;
 const SOCKET_TIMEOUT = 60 * 10 * 1000;

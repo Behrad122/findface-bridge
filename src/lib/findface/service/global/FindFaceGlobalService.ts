@@ -1668,6 +1668,80 @@ export class ListenerService
       }
     );
   };
+
+  public captureVideo = async (
+    request: TRequest<{ cameraId: number }>,
+    attempt = 0
+  ) => {
+    this.loggerService.log("findFaceGlobalService captureVideo", {
+      request,
+      attempt,
+    });
+    return await ContextService.runInContext(
+      async (): Promise<TResponse<Blob>> => {
+        try {
+          const data = await this.capturePublicService.captureVideo(
+            request.data.cameraId
+          );
+          if (data === CANCELED_PROMISE_SYMBOL) {
+            throw new Error("request canceled");
+          }
+          this.loggerService.log("findFaceGlobalService captureVideo ok", {
+            request,
+            data,
+          });
+          return {
+            status: "ok",
+            serviceName: request.serviceName,
+            clientId: request.clientId,
+            userId: request.userId,
+            requestId: request.requestId,
+            data,
+          };
+        } catch (error: any) {
+          if (attempt >= MAX_AUTH_ATTEMPTS) {
+            this.loggerService.log(
+              "findFaceGlobalService captureVideo max attempts reached",
+              {
+                request,
+                error: errorData(error),
+              }
+            );
+          } else if (error?.statusCode === 401 || error?.statusCode === 403) {
+            this.loggerService.log("findFaceGlobalService captureVideo 401", {
+              request,
+            });
+            this.getToken.clear();
+            return await this.captureVideo(request, attempt + 1);
+          }
+          this.loggerService.log("findFaceGlobalService captureVideo error", {
+            request,
+            error: errorData(error),
+          });
+          return {
+            status: "error",
+            error: getErrorMessage(error),
+            clientId: request.clientId,
+            requestId: request.requestId,
+            serviceName: request.serviceName,
+            userId: request.userId,
+          };
+        }
+      },
+      {
+        clientId: request.clientId,
+        serviceName: request.serviceName,
+        requestId: request.userId,
+        userId: request.userId,
+        token: await this.getToken({
+          clientId: request.clientId,
+          requestId: request.requestId,
+          serviceName: request.serviceName,
+          userId: request.userId,
+        }),
+      }
+    );
+  };
 }
 
 export default ListenerService;
